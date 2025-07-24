@@ -1,0 +1,10 @@
+# docker-compose.yaml
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.51
+    ports:
+      - "16686:16686" # UI
+      - "4318:4318" # OTLP (receive spans)
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
