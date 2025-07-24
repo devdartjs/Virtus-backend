@@ -3,10 +3,16 @@
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "seed": "bun run database/seed.ts"
+  },
+  "prisma": {
+    "seed": "bun run database/seed.ts"
   },
   "dependencies": {
-    "elysia": "latest"
+    "@prisma/client": "^6.12.0",
+    "elysia": "latest",
+    "prisma": "^6.12.0"
   },
   "devDependencies": {
     "bun-types": "latest"
