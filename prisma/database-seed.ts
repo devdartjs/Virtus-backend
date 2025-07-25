@@ -1,6 +1,8 @@
-import { prisma } from "./prisma";
+import { prisma } from "./database-prisma";
 
 async function seed() {
+  console.log("Seeding to:", process.env.DATABASE_URL);
+
   const count = await prisma.product.count();
   if (count === 0) {
     await prisma.product.createMany({
@@ -86,3 +88,8 @@ async function seed() {
 
   await prisma.$disconnect();
 }
+
+seed().catch((e) => {
+  console.error("❌ Failed to seed:", e);
+  process.exit(1);
+});

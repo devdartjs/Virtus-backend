@@ -1,5 +1,5 @@
 name = "elysia-app"
-main = "src/index.ts"
+main = "src/server.ts"
 
 preload = ["./src/instrumentation.ts"]
 
