@@ -1,3 +1,4 @@
+import { DeliveryOption } from "@prisma/client";
 import { prisma } from "../../../prisma/database-prisma";
 import { Product } from "./model-products";
 

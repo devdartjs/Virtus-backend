@@ -3,8 +3,8 @@ import { prisma } from "./database-prisma";
 async function seed() {
   console.log("Seeding to:", process.env.DATABASE_URL);
 
-  const count = await prisma.product.count();
-  if (count === 0) {
+  const countProducts = await prisma.product.count();
+  if (countProducts === 0) {
     await prisma.product.createMany({
       data: [
         {
@@ -85,6 +85,52 @@ async function seed() {
   }
 
   console.log("Database already has products, skipping seeding.");
+
+  const countDeliveryOptions = await prisma.deliveryOption.count();
+  if (countDeliveryOptions === 0) {
+    await prisma.deliveryOption.createMany({
+      data: [
+        {
+          id: "1",
+          deliveryDays: 7,
+          priceCents: 0,
+        },
+        {
+          id: "2",
+          deliveryDays: 3,
+          priceCents: 499,
+        },
+        {
+          id: "3",
+          deliveryDays: 1,
+          priceCents: 999,
+        },
+      ],
+    });
+    console.log("✅ Delivery options seeded.");
+  }
+
+  console.log("🟡 Delivery options already exist. Skipping delivery seeding.");
+
+  const countCartItems = await prisma.cartItem.count();
+  if (countCartItems === 0) {
+    await prisma.cartItem.createMany({
+      data: [
+        {
+          productId: "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
+          quantity: 2,
+          deliveryOptionId: "1",
+        },
+        {
+          productId: "15b6fc6f-327a-4ec4-896f-486349e85a3d",
+          quantity: 1,
+          deliveryOptionId: "2",
+        },
+      ],
+    });
+    console.log("✅ Cart items seeded.");
+  }
+  console.log("🟡 Cart Items already exist. Skipping Cart Items seeding.");
 
   await prisma.$disconnect();
 }
