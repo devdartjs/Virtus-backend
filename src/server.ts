@@ -8,6 +8,7 @@ import { ConsoleSpanExporter } from "@opentelemetry/sdk-trace-base";
 import { productsRoute } from "./modules/products/controller-products";
 import { deliveryOptionsRoute } from "./modules/delivery-options/controller-do";
 import { cartItemsRoute } from "./modules/cart-items/controller-cart-item";
+import { ordersRoute } from "./modules/orders/controller-orders";
 
 const app = new Elysia()
   .use(cors())
@@ -25,6 +26,7 @@ const app = new Elysia()
   .use(productsRoute)
   .use(deliveryOptionsRoute)
   .use(cartItemsRoute)
+  .use(ordersRoute)
   .get("/", () => "Hello Elysia")
   .listen(process.env.PORT || 5000);
 
