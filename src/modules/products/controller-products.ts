@@ -52,7 +52,14 @@ export const productsRoute = new Elysia({ prefix: "/api/v1" })
             set.status = 400;
             throw new ProductError("No Products Available");
           }
-          return products || [];
+
+          const response = {
+            success: true,
+            total: products.length,
+            products: products || [],
+          };
+
+          return response;
         } catch (err) {
           if (err instanceof ProductError) {
             set.status = 404;
@@ -65,6 +72,10 @@ export const productsRoute = new Elysia({ prefix: "/api/v1" })
       });
     },
     {
-      response: t.Array(ProductSchemaT),
+      response: t.Object({
+        success: t.Boolean(),
+        total: t.Number(),
+        products: t.Array(ProductSchemaT),
+      }),
     }
   );

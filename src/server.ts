@@ -29,5 +29,11 @@ const app = new Elysia()
   .listen(process.env.PORT || 5000);
 
 console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port} | http://localhost:${process.env.PORT} | Jaeger ui: http://localhost:16686  | Jeager OTLP http://localhost:4318/v1/trace`
+  `✅ Elysia Server is running at http://${app.server?.hostname}:${app.server?.port}`
+);
+
+console.log(`✅ Jeager.UI is running at http://localhost:16686`);
+
+console.log(
+  `✅ Jeager.OTLP is running at Jeager OTLP http://localhost:4318/v1/trace`
 );

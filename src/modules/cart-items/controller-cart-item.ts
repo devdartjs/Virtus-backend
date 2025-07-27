@@ -2,22 +2,41 @@ import { Elysia, t } from "elysia";
 import { record } from "@elysiajs/opentelemetry";
 import { CartItemsSchemaT } from "./schema-cart-item";
 import { CartItemsService } from "./service-cart-item";
+import { ProductService } from "../products/service-products";
 
 export const cartItemsRoute = new Elysia({ prefix: "/api/v1" })
   .get(
     "/cart-items",
-    async ({ set }) => {
-      return record("db.listCartItems", async () => {
+    async ({ set, query }) =>
+      record("db.listCartItems", async () => {
         try {
-          return await CartItemsService.getCartItems();
+          const { expand } = query;
+          let cartItems = await CartItemsService.getCartItems();
+
+          if (expand === "product") {
+            const allProducts = await ProductService.getAllProducts();
+
+            const productMap = new Map(
+              allProducts.map((product) => [product.id, product])
+            );
+
+            cartItems = cartItems.map((item) => ({
+              ...item,
+              product: productMap.get(item.productId) || null,
+            }));
+          }
+
+          return cartItems;
         } catch (err) {
           console.error("GET /cart-items error:", err);
           set.status = 500;
           throw new Error("Failed to fetch cart items");
         }
-      });
-    },
+      }),
     {
+      query: t.Object({
+        expand: t.Optional(t.Enum({ product: "product" })),
+      }),
       response: t.Array(CartItemsSchemaT),
     }
   )
@@ -50,7 +69,7 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1" })
       body: t.Object({
         productId: t.String({ format: "uuid" }),
         quantity: t.Integer({ minimum: 1, maximum: 10 }),
-        deliveryOptionId: t.String({ format: "uuid" }),
+        deliveryOptionId: t.String(),
       }),
       response: CartItemsSchemaT,
     }
