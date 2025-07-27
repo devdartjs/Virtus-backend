@@ -40,3 +40,15 @@ export const OrdersResponseSchema = t.Array(OrderSchema);
 export const OrdersQuerySchema = t.Object({
   expand: t.Optional(t.Literal("products")),
 });
+
+//POST
+
+export const CreateOrderCartItemSchema = t.Object({
+  productId: t.String({ format: "uuid" }),
+  quantity: t.Integer({ minimum: 1 }),
+  deliveryOptionId: t.String(),
+});
+
+export const CreateOrderSchema = t.Object({
+  cart: t.Array(CreateOrderCartItemSchema),
+});
