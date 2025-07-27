@@ -1,5 +1,6 @@
 import { CartItem } from "@prisma/client";
 import { prisma } from "../../../prisma/database-prisma";
+import { ProductService } from "../products/service-products";
 
 export class CartItemsService {
   static async getCartItems(): Promise<CartItem[]> {
@@ -53,5 +54,38 @@ export class CartItemsService {
 
   static async findCartItem(id: string) {
     return await prisma.cartItem.findUnique({ where: { id } });
+  }
+
+  static async findByProductId(productId: string) {
+    return await prisma.cartItem.findFirst({
+      where: { productId },
+    });
+  }
+
+  static async createOrUpdateCartItem(productId: string, quantity: number) {
+    const [product, existingItem] = await Promise.all([
+      ProductService.getProductById(productId),
+      this.findByProductId(productId),
+    ]);
+
+    if (!product) return { error: "product-not-found" };
+
+    if (existingItem) {
+      const newQuantity = Math.min(existingItem.quantity + quantity, 10);
+
+      const updated = await this.updateCartItem(existingItem.id, {
+        quantity: newQuantity,
+      });
+
+      return { item: updated, created: false };
+    }
+
+    const created = await this.createCartItem({
+      productId,
+      quantity,
+      deliveryOptionId: "1",
+    });
+
+    return { item: created, created: true };
   }
 }

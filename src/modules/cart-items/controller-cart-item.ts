@@ -42,34 +42,49 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1" })
   )
   .post(
     "/cart-items",
-    async ({ body, set }) => {
-      return record("db.createCartItem", async () => {
-        try {
-          const newItem = await CartItemsService.createCartItem(body);
-          set.status = 201;
-          return newItem;
-        } catch (err: any) {
-          console.error("POST /cart-items error:", err);
+    async ({ body, set }) =>
+      record("db.createOrUpdateCartItem", async () => {
+        const { productId, quantity } = body;
 
-          if (err.code === "P2003") {
-            set.status = 400;
-            if (err.meta?.field_name?.includes("productId"))
-              throw new Error("Product not found");
-            if (err.meta?.field_name?.includes("deliveryOptionId"))
-              throw new Error("Delivery option not found");
-            throw new Error("Invalid foreign key reference");
-          }
-
-          set.status = 500;
-          throw new Error("Unexpected error creating cart item");
+        if (quantity < 1 || quantity > 10) {
+          set.status = 400;
+          throw new Error("Quantity must be between 1 and 10");
         }
-      });
-    },
+
+        const [product, existingItem] = await Promise.all([
+          ProductService.getProductById(productId),
+          CartItemsService.findByProductId(productId),
+        ]);
+
+        if (!product) {
+          set.status = 404;
+          throw new Error("Product not found");
+        }
+
+        if (existingItem) {
+          const newQuantity = Math.min(existingItem.quantity + quantity, 10);
+          const updated = await CartItemsService.updateCartItem(
+            existingItem.id,
+            {
+              quantity: newQuantity,
+            }
+          );
+          return updated;
+        }
+
+        const created = await CartItemsService.createCartItem({
+          productId,
+          quantity,
+          deliveryOptionId: "1",
+        });
+
+        set.status = 201;
+        return created;
+      }),
     {
       body: t.Object({
         productId: t.String({ format: "uuid" }),
         quantity: t.Integer({ minimum: 1, maximum: 10 }),
-        deliveryOptionId: t.String(),
       }),
       response: CartItemsSchemaT,
     }
