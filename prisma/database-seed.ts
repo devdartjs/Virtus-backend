@@ -1,6 +1,6 @@
 import { prisma } from "./database-prisma";
 
-async function seed() {
+export async function seed() {
   console.log("Seeding to:", process.env.DATABASE_URL);
 
   const countProducts = await prisma.product.count();

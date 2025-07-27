@@ -118,3 +118,48 @@ export async function createOrder(
 
   return order;
 }
+
+export async function getOrderById(orderId: string, expandProduct: boolean) {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      items: {
+        include: {
+          product: expandProduct,
+        },
+      },
+    },
+  });
+
+  if (!order) return null;
+
+  return {
+    id: order.id,
+    orderTimeMs: Number(order.orderTimeMs),
+    totalCostCents: order.totalCostCents,
+    products: order.items.map((item) => {
+      const base = {
+        productId: item.productId,
+        quantity: item.quantity,
+        estimatedDeliveryTimeMs: Number(item.estimatedDeliveryTimeMs),
+      };
+
+      if (expandProduct && item.product) {
+        return {
+          ...base,
+          product: {
+            id: item.product.id,
+            name: item.product.name,
+            image: item.product.image,
+            stars: item.product.stars,
+            ratingCount: item.product.ratingCount,
+            priceCents: item.product.priceCents,
+            keywords: item.product.keywords,
+          },
+        };
+      }
+
+      return base;
+    }),
+  };
+}

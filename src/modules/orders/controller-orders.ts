@@ -3,6 +3,8 @@ import { record } from "@elysiajs/opentelemetry";
 import { OrdersQuerySchema, OrdersResponseSchema } from "./schema.orders";
 import { listOrders, createOrder } from "./service-orders";
 import { CreateOrderSchema } from "./schema.orders";
+import { getOrderById } from "./service-orders";
+import { OrderSchema } from "./schema.orders";
 
 export const ordersRoute = new Elysia({ prefix: "/api/v1" })
   .get(
@@ -88,5 +90,35 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1" })
           ])
         ),
       }),
+    }
+  )
+  .get(
+    "/orders/:orderid",
+    async ({ set, query, params }) =>
+      record("db.getOrderById", async () => {
+        try {
+          const expandProduct = query.expand === "products";
+          const order = await getOrderById(params.orderid, expandProduct);
+
+          if (!order) {
+            set.status = 404;
+            throw new Error("Order not found");
+          }
+
+          return order;
+        } catch (error) {
+          console.error("GET /orders/:orderid error:", error);
+          if (set.status !== 404) set.status = 500;
+          throw error instanceof Error
+            ? error
+            : new Error("Failed to fetch order");
+        }
+      }),
+    {
+      query: OrdersQuerySchema,
+      params: t.Object({
+        orderid: t.String({ format: "uuid" }),
+      }),
+      response: OrderSchema,
     }
   );
