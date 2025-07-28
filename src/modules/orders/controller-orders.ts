@@ -138,4 +138,45 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
         ),
       }),
     }
+  )
+  .delete(
+    "/:id",
+    async ({ set, params }) =>
+      record("db.deleteOrder", async () => {
+        try {
+          const order = await prisma.order.findUnique({
+            where: { id: params.id },
+          });
+
+          console.log(order);
+
+          if (!order) {
+            set.status = 404;
+            throw new Error("Order not found");
+          }
+
+          await prisma.orderItem.deleteMany({
+            where: { orderId: params.id },
+          });
+
+          await prisma.order.delete({
+            where: { id: params.id },
+          });
+
+          return { success: true, message: "Order deleted successfully" };
+        } catch (error) {
+          console.error("DELETE /orders/:id error:", error);
+          set.status = 500;
+          throw new Error("Failed to delete order");
+        }
+      }),
+    {
+      params: t.Object({
+        id: t.String({ format: "uuid" }),
+      }),
+      response: t.Object({
+        success: t.Boolean(),
+        message: t.String(),
+      }),
+    }
   );
