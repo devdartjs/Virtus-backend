@@ -10,6 +10,7 @@ import { deliveryOptionsRoute } from "./modules/delivery-options/controller-do";
 import { cartItemsRoute } from "./modules/cart-items/controller-cart-item";
 import { ordersRoute } from "./modules/orders/controller-orders";
 import { resetRoute } from "./modules/reset/controller-reset";
+import { getPaymentSummaryRoute } from "./modules/payment-summary/controller-ps";
 
 const app = new Elysia()
   .use(cors())
@@ -29,6 +30,7 @@ const app = new Elysia()
   .use(cartItemsRoute)
   .use(ordersRoute)
   .use(resetRoute)
+  .use(getPaymentSummaryRoute)
   .get("/", () => "Hello Elysia")
   .listen(process.env.PORT || 5000);
 
