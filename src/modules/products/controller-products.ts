@@ -4,7 +4,7 @@ import { ProductService } from "./service-products";
 import { ProductSchemaT } from "./schema-products";
 import { ProductError } from "./Error/ProductErrorClass";
 
-export const productsRoute = new Elysia({ prefix: "/api/v1" })
+export const productsRoute = new Elysia({ prefix: "/api/v1/products" })
   .error({
     PRODUCT_ERROR: ProductError,
   })
@@ -43,7 +43,7 @@ export const productsRoute = new Elysia({ prefix: "/api/v1" })
     };
   })
   .get(
-    "/products",
+    "/",
     async ({ set }) => {
       return record("db.listProducts", async () => {
         try {

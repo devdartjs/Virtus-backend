@@ -4,9 +4,9 @@ import { CartItemsSchemaT } from "./schema-cart-item";
 import { CartItemsService } from "./service-cart-item";
 import { ProductService } from "../products/service-products";
 
-export const cartItemsRoute = new Elysia({ prefix: "/api/v1" })
+export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
   .get(
-    "/cart-items",
+    "/",
     async ({ set, query }) =>
       record("db.listCartItems", async () => {
         try {
@@ -41,7 +41,7 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1" })
     }
   )
   .post(
-    "/cart-items",
+    "/",
     async ({ body, set }) =>
       record("db.createOrUpdateCartItem", async () => {
         const { productId, quantity } = body;
@@ -90,7 +90,7 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1" })
     }
   )
   .delete(
-    "/cart-items/:id",
+    "/:id",
     async ({ params, set }) => {
       return record("db.deleteCartItem", async () => {
         try {
@@ -111,7 +111,7 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1" })
     }
   )
   .put(
-    "/cart-items/:id",
+    "/:id",
     async ({ set, body, params }) => {
       return record("db.updateCartItem", async () => {
         if (!body.quantity && !body.deliveryOptionId) {

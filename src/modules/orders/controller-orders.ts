@@ -6,9 +6,9 @@ import { CreateOrderSchema } from "./schema.orders";
 import { getOrderById } from "./service-orders";
 import { OrderSchema } from "./schema.orders";
 
-export const ordersRoute = new Elysia({ prefix: "/api/v1" })
+export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
   .get(
-    "/orders",
+    "/",
     async ({ set, query }) =>
       record("db.listOrders", async () => {
         try {
@@ -27,7 +27,7 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1" })
     }
   )
   .post(
-    "/orders",
+    "/",
     async ({ set, body }) =>
       record("db.createOrder", async () => {
         try {
@@ -93,7 +93,7 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1" })
     }
   )
   .get(
-    "/orders/:orderid",
+    "/:orderid",
     async ({ set, query, params }) =>
       record("db.getOrderById", async () => {
         try {
