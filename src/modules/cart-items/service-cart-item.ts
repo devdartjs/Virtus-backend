@@ -4,7 +4,13 @@ import { ProductService } from "../products/service-products";
 
 export class CartItemsService {
   static async getCartItems(): Promise<CartItem[]> {
-    return await prisma.cartItem.findMany();
+    return await prisma.cartItem.findMany({
+      orderBy: {
+        product: {
+          name: "asc",
+        },
+      },
+    });
   }
 
   static async createCartItem(data: {

@@ -151,7 +151,7 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
       }),
       body: t.Object({
         quantity: t.Optional(t.Integer({ minimum: 1, maximum: 10 })),
-        deliveryOptionId: t.Optional(t.String({ format: "uuid" })),
+        deliveryOptionId: t.Optional(t.String()),
       }),
       response: CartItemsSchemaT,
     }
