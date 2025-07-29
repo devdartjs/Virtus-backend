@@ -1,6 +1,6 @@
 # 🟢 Virtus Backend
 
-A fast, modular, and type-safe RESTful backend for the **Virtus eCommerce Platform**, built with **Bun**, **Elysia.js**, and **TypeScript**, powered by **Prisma ORM** and **PostgreSQL**.  
+A modular and type-safe RESTful backend for the **Virtus eCommerce Platform**, built with **Bun**, **Elysia.js**, and **TypeScript**, powered by **Prisma ORM** and **PostgreSQL**.  
 Tested with **Vitest**, documented with **Swagger (OpenAPI 3.0)**, instrumented with **OpenTelemetry** for observability and logs, fully containerized with **Docker**, and integrated into a CI pipeline via **GitHub Actions**.
 
 ---
