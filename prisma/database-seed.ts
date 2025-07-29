@@ -41,17 +41,6 @@ export async function seed() {
           keywords: ["tshirts", "apparel", "mens"],
         },
         {
-          id: "54e0eccd-8f36-462b-b68a-8182611d9add",
-          image: "images/products/2-slot-toaster-white.jpg",
-          name: "2 Slot Toaster - White",
-
-          stars: 5,
-          ratingCount: 2197,
-
-          priceCents: 1899,
-          keywords: ["toaster", "kitchen", "appliances"],
-        },
-        {
           id: "3ebe75dc-64d2-4137-8860-1f5a963e534b",
           image: "images/products/elegant-white-dinner-plate-set.jpg",
           name: "2 Piece White Dinner Plate Set",
@@ -430,17 +419,6 @@ export async function seed() {
 
           priceCents: 3390,
           keywords: ["shoes", "running shoes", "footwear"],
-        },
-        {
-          id: "77a845b1-16ed-4eac-bdf9-5b591882113d",
-          image: "images/products/ratingCountertop-push-blender-black.jpg",
-          name: "ratingCountertop Push Blender - Black",
-
-          stars: 4,
-          ratingCount: 3,
-
-          priceCents: 10747,
-          keywords: ["food blenders", "kitchen", "appliances"],
         },
         {
           id: "bc2847e9-5323-403f-b7cf-57fde044a955",
