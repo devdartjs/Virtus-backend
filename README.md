@@ -1,7 +1,7 @@
 # 🟢 Virtus Backend
 
 A modular and type-safe RESTful backend for the **Virtus eCommerce Platform**, built with **Bun**, **Elysia.js**, and **TypeScript**, powered by **Prisma ORM** and **PostgreSQL**.  
-Tested with **Vitest**, documented with **Swagger (OpenAPI 3.0)**, instrumented with **OpenTelemetry** for observability and logs, fully containerized with **Docker**, and integrated into a CI pipeline via **GitHub Actions**.
+Tested with **Vitest**, documented with **Swagger (OpenAPI 3.0)**, instrumented with **OpenTelemetry** for observability and logs.
 
 ---
 
@@ -27,8 +27,6 @@ Tested with **Vitest**, documented with **Swagger (OpenAPI 3.0)**, instrumented 
 - 📄 Fully documented using **Swagger UI (OpenAPI 3.0)**
 - 🔍 Observability with structured logs via **OpenTelemetry**
 - 🧪 Unit and integration testing with **Vitest**
-- 📦 Containerized for development & production with **Docker**
-- 🚀 CI/CD pipeline using **GitHub Actions**
 - ✨ Type-safe codebase written entirely in **TypeScript**
 
 ---
@@ -43,8 +41,6 @@ Tested with **Vitest**, documented with **Swagger (OpenAPI 3.0)**, instrumented 
 - **Swagger** / **OpenAPI 3.0** for API documentation
 - **OpenTelemetry** for observability and logging
 - **Vitest** for unit testing
-- **Docker** + **DockerHub** for container builds
-- **GitHub Actions** for continuous integration
 
 ---
 
@@ -53,8 +49,7 @@ Tested with **Vitest**, documented with **Swagger (OpenAPI 3.0)**, instrumented 
 ### 🟡 Prerequisites
 
 - **Bun** (>= 1.1.x)
-- **PostgreSQL** (local or via Docker)
-- **Docker** (optional for containerized dev/test)
+- **PostgreSQL**
 - **Git**
 
 ### ⚪ Clone the repository
