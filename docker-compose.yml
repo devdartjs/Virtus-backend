@@ -1,10 +1,51 @@
-# docker-compose.yaml
-
 services:
-  jaeger:
-    image: jaegertracing/all-in-one:1.51
+  app:
+    container_name: virtus-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: your-dockerhub-username/virtus-app:latest # Replace with your Docker Hub or Fly image if needed
+    restart: unless-stopped
     ports:
-      - "16686:16686" # UI
-      - "4318:4318" # OTLP (receive spans)
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - jaeger
+    networks:
+      - virtus-network
+
+  db:
+    container_name: virtus-db
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: neondb
+      POSTGRES_USER: neondb_owner
+      POSTGRES_PASSWORD: npg_g6k4MdfymrDA
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - virtus-network
+
+  jaeger:
+    container_name: virtus-jaeger
+    image: jaegertracing/all-in-one:1.51
+    restart: unless-stopped
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "4318:4318" # OTLP ingest
     environment:
       - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - virtus-network
+
+volumes:
+  postgres_data:
+
+networks:
+  virtus-network:
+    driver: bridge
