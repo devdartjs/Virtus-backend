@@ -1,10 +1,10 @@
 services:
   app:
-    container_name: virtus-app
+    container_name: virtus-backend
     build:
       context: .
       dockerfile: Dockerfile
-    image: your-dockerhub-username/virtus-app:latest # Replace with your Docker Hub or Fly image if needed
+    image: dartw/virtus-backend:latest # Replace with your Docker Hub or Fly image if needed
     restart: unless-stopped
     ports:
       - "3000:3000"
