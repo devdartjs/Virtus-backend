@@ -1,37 +1,21 @@
-# Stage 1: Build
+# Builder
 FROM oven/bun:1.1.13 AS builder
-
 WORKDIR /app
 
-# Copy all files
 COPY . .
-
-# Install dependencies
 RUN bun install --frozen-lockfile
 
-# Generate Prisma client
-RUN bunx prisma generate
-
-# Build the application
-RUN bun build src/server.ts --target=bun --format=esm --outfile=dist/server.js
-
-# Stage 2: Production image
-FROM oven/bun:1.1.13-slim
-
+# Runtime
+FROM oven/bun:1.1.13-slim AS runtime
 WORKDIR /app
 
-# Copy only necessary files from builder stage
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/bun.lockb ./
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.env .env
-
-# Install only production dependencies
-RUN bun install --production --frozen-lockfile
+COPY --from=builder /app .
 
 EXPOSE 3000
 
-# Run the app
-CMD ["bun", "dist/server.js"]
+CMD ["bun", "src/server.ts"]
+
+#cmd utils
+#docker builder prune --all --force
+#docker image prune --all --force
+#docker build --no-cache -t virtus-backend:v1 .

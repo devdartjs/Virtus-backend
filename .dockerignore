@@ -1,0 +1,11 @@
+node_modules
+bun.lockb
+.git
+Dockerfile
+.dockerignore
+.env.*.local
+*.log
+.vscode
+*.md
+*.tsbuildinfo
+/tests
