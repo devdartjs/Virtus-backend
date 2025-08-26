@@ -1,3 +1,4 @@
+import "./loadEnv.ts";
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
@@ -31,7 +32,9 @@ const app = new Elysia()
   .use(ordersRoute)
   .use(resetRoute)
   .use(getPaymentSummaryRoute)
-  .get("/", () => "Hello Elysia")
+  .get("/", () => {
+    ("Hello Elysia");
+  })
   .listen(process.env.PORT || 5000);
 
 console.log(
