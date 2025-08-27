@@ -82,11 +82,3 @@ docker-compose --profile dev up --build
 
 Adminer (Access database UI in development environment)
 http://localhost:8080
-
-### ⚪ Clone the repository and run with containers (stage environment)
-
-```bash
-git clone https://github.com/devdartjs/Virtus-backend.git
-cd virtus-backend
-docker-compose --profile stage up --build
-```
