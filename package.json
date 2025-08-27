@@ -23,6 +23,7 @@
     "@prisma/client": "^6.12.0",
     "dotenv": "^17.2.1",
     "elysia": "latest",
+    "ioredis": "^5.7.0",
     "pg": "^8.15.6",
     "prisma": "^6.12.0",
     "zod": "^4.0.10"

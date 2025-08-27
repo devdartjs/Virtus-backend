@@ -12,6 +12,13 @@ import { cartItemsRoute } from "./modules/cart-items/controller-cart-item";
 import { ordersRoute } from "./modules/orders/controller-orders";
 import { resetRoute } from "./modules/reset/controller-reset";
 import { getPaymentSummaryRoute } from "./modules/payment-summary/controller-ps";
+import { ProductService } from "./modules/products/service-products";
+
+if (process.env.NODE_ENV === "stage") {
+  ProductService.preloadCache()
+    .then(() => console.log("Product cache successfully preloaded"))
+    .catch((err) => console.error("Error preloading cache:", err));
+}
 
 const isDevOrStage = ["development", "stage"].includes(
   process.env.NODE_ENV || ""
@@ -42,7 +49,7 @@ const app = new Elysia()
   .use(ordersRoute)
   .use(resetRoute)
   .use(getPaymentSummaryRoute)
-  .get("/", ({ request, headers }) => {
+  .get("/", ({ headers }) => {
     return {
       message: "Hello Elysia",
       realIp: headers["x-real-ip"] ?? "not provided",
