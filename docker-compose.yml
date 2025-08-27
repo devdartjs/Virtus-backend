@@ -16,18 +16,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
 
-  app:
-    build: .
-    restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
-    depends_on:
-      db:
-        condition: service_healthy
   adminer:
     image: adminer
     restart: always
@@ -35,6 +26,106 @@ services:
       - "8080:8080"
     depends_on:
       - db
+    networks:
+      - app-network
+
+  app:
+    build: .
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    profiles:
+      - dev
+
+  app1:
+    build: .
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    profiles:
+      - stage
+
+  app2:
+    build: .
+    restart: always
+    ports:
+      - "3002:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    profiles:
+      - stage
+
+  app3:
+    build: .
+    restart: always
+    ports:
+      - "3003:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    profiles:
+      - stage
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app1
+      - app2
+      - app3
+    networks:
+      - app-network
+    profiles:
+      - stage
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    depends_on:
+      - nginx
+    networks:
+      - app-network
+    profiles:
+      - stage
 
 volumes:
   db_data:
+
+networks:
+  app-network:
+    driver: bridge
+#docker-compose --profile dev up --build
+#docker-compose --profile stage up --build

@@ -72,12 +72,12 @@ bun dev
 API available at: http://localhost:3000
 Swagger UI: http://localhost:3000/swagger
 
-### ⚪ Clone the repository and run with containers
+### ⚪ Clone the repository and run with containers (development environment)
 
 ```bash
 git clone https://github.com/devdartjs/Virtus-backend.git
 cd virtus-backend
-docker compose up --build
+docker-compose --profile dev up --build
 ```
 
 Adminer (Access database UI in development environment)
