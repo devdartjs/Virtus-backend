@@ -62,7 +62,7 @@ Tested with **Vitest**, documented with **Swagger (OpenAPI 3.0)**, instrumented 
 
 ```bash
 git clone https://github.com/your-username/virtus-backend.git
-cd virtus-backend
+cd virtus-backend/app
 bun install
 bun prisma migrate dev --name init
 bun prisma generate
@@ -70,17 +70,17 @@ bun dev
 ```
 
 API available at: http://localhost:3000
-Swagger UI: http://localhost:3000/docs
+Swagger UI: http://localhost:3000/swagger
 
 ### ⚪ Clone the repository and run with containers
 
 ```bash
-git clone https://github.com/your-username/virtus-backend.git
+git clone https://github.com/devdartjs/Virtus-backend.git
 cd virtus-backend
 docker compose up --build
 ```
 
-API available at: http://localhost:3000
-Swagger UI: http://localhost:3000/docs
-Prisma Studio: scripts\studio-start-w11.cmd (Windows)
-Prisma Studio: scripts\studio-start-linux-mac.sh (Linux/MacOS)
+Adminer (Access database UI in development environment)
+http://localhost:8080
+
+### ⚪ Clone the repository and run with containers

@@ -1,5 +1,5 @@
 node_modules
-bun.lockb
+src/generated
 .git
 Dockerfile
 .dockerignore
@@ -9,3 +9,11 @@ Dockerfile
 *.md
 *.tsbuildinfo
 /tests
+
+**/*.trace
+**/*.zip
+**/*.tar.gz
+**/*.tgz
+**/*.log
+**/*.bun
+/src/generated/prisma

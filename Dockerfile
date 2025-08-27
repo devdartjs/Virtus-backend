@@ -1,8 +1,15 @@
 # Builder
 FROM oven/bun:1.1.13 AS builder
 WORKDIR /app
-COPY . .
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
+
+COPY prisma ./prisma
+COPY src ./src
+COPY .env ./
+COPY .env.stage ./
+RUN bun run build
+
 
 # Runtime
 FROM oven/bun:1.1.13-slim AS runtime

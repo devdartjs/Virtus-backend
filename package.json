@@ -11,8 +11,8 @@
     "prisma:migrate": "bun run prisma migrate deploy",
     "seed": "bun run prisma/database-seed.ts",
     "build": "bun run build:bundle && bun run build:copy",
-    "build:bundle": "bun build src/server.ts --outfile dist/server.js --minify",
-    "build:copy": "cp .env dist/.env && cp -R prisma dist/prisma"
+    "build:bundle": "bun build src/server.ts --outfile dist/server.js --minify --target bun",
+    "build:copy": "cp .env dist/.env && cp .env.stage dist/.env.stage && cp -R prisma dist/prisma"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.3.3",

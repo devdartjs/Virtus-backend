@@ -13,16 +13,26 @@ import { ordersRoute } from "./modules/orders/controller-orders";
 import { resetRoute } from "./modules/reset/controller-reset";
 import { getPaymentSummaryRoute } from "./modules/payment-summary/controller-ps";
 
+const isDevOrStage = ["development", "stage"].includes(
+  process.env.NODE_ENV || ""
+);
+
 const app = new Elysia()
   .use(cors())
   .use(swagger())
   .use(
     opentelemetry({
       spanProcessors: [
-        new BatchSpanProcessor(new ConsoleSpanExporter()),
-        new BatchSpanProcessor(
-          new OTLPTraceExporter({ url: "http://localhost:4318/v1/traces" })
-        ),
+        ...(isDevOrStage
+          ? [
+              new BatchSpanProcessor(new ConsoleSpanExporter()),
+              new BatchSpanProcessor(
+                new OTLPTraceExporter({
+                  url: "http://localhost:4318/v1/traces",
+                })
+              ),
+            ]
+          : []),
       ],
     })
   )
@@ -32,18 +42,13 @@ const app = new Elysia()
   .use(ordersRoute)
   .use(resetRoute)
   .use(getPaymentSummaryRoute)
-  .get("/", () => {
-    ("Hello Elysia");
-  })
+  .get("/", () => "Hello Elysia")
   .listen(process.env.PORT || 5000);
 
-console.log(
-  `✅ Elysia Server is running at http://${app.server?.hostname}:${app.server?.port}`
-);
-
-console.log(`✅ Jeager.UI is running at http://localhost:16686`);
-
-console.log(
-  `✅ Jeager.OTLP is running at Jeager OTLP http://localhost:4318/v1/trace`
-);
-//
+if (isDevOrStage) {
+  console.log(
+    `✅ Elysia Server is running at http://${app.server?.hostname}:${app.server?.port}`
+  );
+  console.log(`✅ Jaeger.UI is running at http://localhost:16686`);
+  console.log(`✅ Jaeger.OTLP is running at http://localhost:4318/v1/trace`);
+}
