@@ -42,7 +42,17 @@ const app = new Elysia()
   .use(ordersRoute)
   .use(resetRoute)
   .use(getPaymentSummaryRoute)
-  .get("/", () => "Hello Elysia")
+  .get("/", ({ request, headers }) => {
+    return {
+      message: "Hello Elysia",
+      realIp: headers["x-real-ip"] ?? "not provided",
+      forwardedFor: headers["x-forwarded-for"] ?? "not provided",
+      userAgent: headers["user-agent"] ?? "unknown",
+      host: headers["host"] ?? "unknown",
+      protocol: headers["x-forwarded-proto"] ?? "http",
+      timestamp: new Date().toISOString(),
+    };
+  })
   .listen(process.env.PORT || 5000);
 
 if (isDevOrStage) {

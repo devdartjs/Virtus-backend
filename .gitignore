@@ -27,7 +27,7 @@ yarn-error.log*
 # local env files
 .env
 .env.prisma
-.env.test
+.env.stage
 .env.prod
 .env.local
 .env.development.local
