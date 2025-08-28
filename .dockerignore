@@ -1,14 +1,10 @@
 node_modules
 src/generated
 .git
-Dockerfile
-.dockerignore
-.env.*.local
 *.log
 .vscode
 *.md
 *.tsbuildinfo
-/tests
 
 **/*.trace
 **/*.zip

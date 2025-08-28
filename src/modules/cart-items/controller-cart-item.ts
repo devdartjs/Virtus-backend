@@ -136,7 +136,7 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
           if (err.code === "P2003") {
             set.status = 400;
             if (err.meta?.field_name?.includes("deliveryOptionId"))
-              throw new Error("Delivery option not found");
+            {throw new Error("Delivery option not found");}
             throw new Error("Invalid reference");
           }
 

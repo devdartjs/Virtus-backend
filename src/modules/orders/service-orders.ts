@@ -49,7 +49,7 @@ export async function createOrder(
     deliveryOptionId: string;
   }[]
 ) {
-  if (!cart.length) throw new Error("Cart cannot be empty");
+  if (!cart.length) {throw new Error("Cart cannot be empty");}
 
   const productIds = [...new Set(cart.map((item) => item.productId))];
   const deliveryOptionIds = [
@@ -131,7 +131,7 @@ export async function getOrderById(orderId: string, expandProduct: boolean) {
     },
   });
 
-  if (!order) return null;
+  if (!order) {return null;}
 
   return {
     id: order.id,

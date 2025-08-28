@@ -1,3 +1,4 @@
+/* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import "./loadEnv.ts";
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
@@ -32,13 +33,13 @@ const app = new Elysia()
       spanProcessors: [
         ...(isDevOrStage
           ? [
-              new BatchSpanProcessor(new ConsoleSpanExporter()),
-              new BatchSpanProcessor(
-                new OTLPTraceExporter({
-                  url: "http://localhost:4318/v1/traces",
-                })
-              ),
-            ]
+            new BatchSpanProcessor(new ConsoleSpanExporter()),
+            new BatchSpanProcessor(
+              new OTLPTraceExporter({
+                url: "http://localhost:4318/v1/traces",
+              })
+            ),
+          ]
           : []),
       ],
     })
@@ -63,9 +64,9 @@ const app = new Elysia()
   .listen(process.env.PORT || 5000);
 
 if (isDevOrStage) {
-  console.log(
-    `✅ Elysia Server is running at http://${app.server?.hostname}:${app.server?.port}`
-  );
-  console.log(`✅ Jaeger.UI is running at http://localhost:16686`);
-  console.log(`✅ Jaeger.OTLP is running at http://localhost:4318/v1/trace`);
+  console.log(`
+    ✅ Elysia Server is running at http://${app.server?.hostname}:${app.server?.port}
+    ✅ Jaeger.UI is running at http://localhost:16686
+    ✅ Jaeger.OTLP is running at http://localhost:4318/v1/trace
+`);
 }

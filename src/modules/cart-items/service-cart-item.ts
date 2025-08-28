@@ -74,7 +74,7 @@ export class CartItemsService {
       this.findByProductId(productId),
     ]);
 
-    if (!product) return { error: "product-not-found" };
+    if (!product) {return { error: "product-not-found" };}
 
     if (existingItem) {
       const newQuantity = Math.min(existingItem.quantity + quantity, 10);
