@@ -1,3 +1,4 @@
+/* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import redis from "./redis";
 
 export async function getOrSetCache<T>(

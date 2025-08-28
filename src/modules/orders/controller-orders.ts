@@ -1,3 +1,4 @@
+/* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import { Elysia, t } from "elysia";
 import { record } from "@elysiajs/opentelemetry";
 import { OrdersQuerySchema, OrdersResponseSchema } from "./schema.orders";
@@ -42,7 +43,9 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
           return order;
         } catch (error) {
           console.error("GET /orders/:orderid error:", error);
-          if (set.status !== 404) set.status = 500;
+          if (set.status !== 404) {
+            set.status = 500;
+          }
           throw error instanceof Error
             ? error
             : new Error("Failed to fetch order");

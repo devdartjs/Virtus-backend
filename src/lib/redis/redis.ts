@@ -1,3 +1,4 @@
+/* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import Redis from "ioredis";
 
 const redis = new Redis({

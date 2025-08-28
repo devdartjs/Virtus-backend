@@ -129,5 +129,5 @@ volumes:
 networks:
   app-network:
     driver: bridge
-#docker-compose --profile dev up --build
-#docker-compose --profile stage up --build
+#docker-compose --profile dev up --build -d
+#docker-compose --profile stage up --build -d   ----------> # curl -i http://localhost    (access to nginx server)

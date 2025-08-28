@@ -1,3 +1,5 @@
+/* eslint no-console: ["error", { "allow": ["log", "error"] }] */
+/* eslint-disable indent */
 import "./loadEnv.ts";
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
@@ -14,14 +16,14 @@ import { resetRoute } from "./modules/reset/controller-reset";
 import { getPaymentSummaryRoute } from "./modules/payment-summary/controller-ps";
 import { ProductService } from "./modules/products/service-products";
 
-if (process.env.NODE_ENV === "stage") {
+if (process.env.BUN_ENV === "stage") {
   ProductService.preloadCache()
     .then(() => console.log("Product cache successfully preloaded"))
     .catch((err) => console.error("Error preloading cache:", err));
 }
 
 const isDevOrStage = ["development", "stage"].includes(
-  process.env.NODE_ENV || ""
+  process.env.BUN_ENV || ""
 );
 
 const app = new Elysia()
@@ -63,9 +65,9 @@ const app = new Elysia()
   .listen(process.env.PORT || 5000);
 
 if (isDevOrStage) {
-  console.log(
-    `✅ Elysia Server is running at http://${app.server?.hostname}:${app.server?.port}`
-  );
-  console.log(`✅ Jaeger.UI is running at http://localhost:16686`);
-  console.log(`✅ Jaeger.OTLP is running at http://localhost:4318/v1/trace`);
+  console.log(`
+    ✅ Elysia Server is running at http://${app.server?.hostname}:${app.server?.port}
+    ✅ Jaeger.UI is running at http://localhost:16686
+    ✅ Jaeger.OTLP is running at http://localhost:4318/v1/trace
+`);
 }
