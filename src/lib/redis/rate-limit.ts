@@ -18,6 +18,7 @@ export async function rateLimiter(ip: string) {
     const error = new Error(
       `Too many requests. Try again in ${retryAfter} seconds.`
     );
+
     (error as any).status = 429;
     throw error;
   }
