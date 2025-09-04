@@ -18,6 +18,11 @@ services:
       retries: 5
     networks:
       - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.5"
 
   adminer:
     image: adminer
@@ -30,6 +35,11 @@ services:
       - app-network
     profiles:
       - dev
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+          cpus: "0.25"
 
   app:
     build: .
@@ -46,6 +56,11 @@ services:
       - app-network
     profiles:
       - dev
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.5"
 
   app1:
     build: .
@@ -62,6 +77,11 @@ services:
       - app-network
     profiles:
       - stage
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.5"
 
   app2:
     build: .
@@ -78,6 +98,11 @@ services:
       - app-network
     profiles:
       - stage
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.5"
 
   app3:
     build: .
@@ -94,6 +119,11 @@ services:
       - app-network
     profiles:
       - stage
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.5"
 
   nginx:
     image: nginx:alpine
@@ -110,18 +140,47 @@ services:
       - app-network
     profiles:
       - stage
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+          cpus: "0.25"
 
   redis:
     image: redis:7
     container_name: redis
     ports:
       - "6379:6379"
-    depends_on:
-      - nginx
     networks:
       - app-network
     profiles:
       - stage
+      - test
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+          cpus: "0.25"
+  app4:
+    build: .
+    restart: always
+    ports:
+      - "3004:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    profiles:
+      - test
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.5"
 
 volumes:
   db_data:
@@ -130,4 +189,6 @@ networks:
   app-network:
     driver: bridge
 #docker-compose --profile dev up --build -d
-#docker-compose --profile stage up --build -d   ----------> # curl -i http://localhost    (access to nginx server)
+#docker-compose --profile stage up --build -d   ---------->
+
+# curl -i http://localhost    (verify access to nginx server)
