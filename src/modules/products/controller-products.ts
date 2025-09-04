@@ -48,8 +48,7 @@ export const productsRoute = new Elysia({ prefix: "/api/v1/products" })
     "/",
     async ({ set, request }) => {
       const ip = request.headers.get("x-forwarded-for") || "unknown";
-
-      await rateLimiter(ip);
+      ip ? await rateLimiter(ip) : "undefined";
 
       return record("db.listProducts", async () => {
         try {

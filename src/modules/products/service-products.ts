@@ -8,9 +8,9 @@ export class ProductService {
     return getOrSetCache(
       "products:all",
       async () => {
-        return prisma.product.findMany();
+        return await prisma.product.findMany();
       },
-      Number(process.env.CACHE_TTL) || 3600
+      Number(process.env.CACHE_TTL) || 60
     );
   }
 
