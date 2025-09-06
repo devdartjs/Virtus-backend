@@ -1,3 +1,4 @@
+/* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import { Elysia } from "elysia";
 import { prisma } from "../../../prisma/database-prisma";
 
