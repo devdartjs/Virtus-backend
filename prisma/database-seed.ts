@@ -1,3 +1,4 @@
+/* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import { prisma } from "./database-prisma";
 
 export async function seed() {

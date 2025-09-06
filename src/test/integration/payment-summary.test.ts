@@ -12,39 +12,41 @@ beforeAll(async () => {
   await prisma.$connect();
   await redis.flushall();
 
+  // Limpa apenas tabelas necessárias para evitar conflito com seed
   await prisma.cartItem.deleteMany();
-  await prisma.deliveryOption.deleteMany();
-  await prisma.product.deleteMany();
 
-  const product = await prisma.product.create({
+  // Criar produto de teste isolado
+  const testProduct = await prisma.product.create({
     data: {
-      name: "Test Product",
-      image: "http://example.com/img.png",
-      stars: 4,
-      ratingCount: 10,
+      name: "Integration Test Product",
+      image: "http://example.com/test.png",
+      stars: 5,
+      ratingCount: 99,
       priceCents: 5000,
-      keywords: ["test", "product"],
+      keywords: ["integration", "test"],
     },
   });
 
-  const deliveryOption = await prisma.deliveryOption.create({
+  // Criar delivery option de teste (id único p/ não conflitar com seed)
+  const testDeliveryOption = await prisma.deliveryOption.create({
     data: {
-      id: "express",
+      id: "express-test",
       deliveryDays: 2,
       priceCents: 1000,
     },
   });
 
+  // Criar itens de carrinho vinculados
   await prisma.cartItem.createMany({
     data: [
       {
-        productId: product.id,
-        deliveryOptionId: deliveryOption.id,
+        productId: testProduct.id,
+        deliveryOptionId: testDeliveryOption.id,
         quantity: 2,
       },
       {
-        productId: product.id,
-        deliveryOptionId: deliveryOption.id,
+        productId: testProduct.id,
+        deliveryOptionId: testDeliveryOption.id,
         quantity: 1,
       },
     ],
@@ -52,6 +54,17 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  // Limpa o que foi criado para manter o banco consistente
+  await prisma.cartItem.deleteMany({
+    where: { product: { name: "Integration Test Product" } },
+  });
+  await prisma.product.deleteMany({
+    where: { name: "Integration Test Product" },
+  });
+  await prisma.deliveryOption.deleteMany({
+    where: { id: "express-test" },
+  });
+
   await prisma.$disconnect();
   await redis.quit();
 });
@@ -67,7 +80,7 @@ describe("GET /api/v1/payment-summary - Integration Test", () => {
     const body = await response.json();
     console.log("Payment summary response:", body);
 
-    // Expect: 3 itens, each one 5000 of product + 1000 of delivery
+    // 3 itens (2 + 1) → cada produto = 5000, delivery = 1000
     // productCost = 15000, shipping = 3000, subtotal = 18000
     // tax = 1800 (10%), total = 19800
     expect(response.status).toBe(200);
