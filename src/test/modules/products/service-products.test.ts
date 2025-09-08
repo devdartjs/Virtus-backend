@@ -3,7 +3,6 @@ import { ProductService } from "../../../modules/products/service-products";
 import { Product } from "../../../modules/products/model-products";
 import * as cacheModule from "../../../lib/redis/cache";
 
-// Mock do módulo Redis
 vi.mock("../../../lib/redis/cache");
 
 const getOrSetCache = vi.mocked(cacheModule.getOrSetCache);

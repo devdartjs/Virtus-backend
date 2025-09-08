@@ -5,7 +5,7 @@ import { OrdersQuerySchema, OrdersResponseSchema } from "./schema.orders";
 import { listOrders, createOrder } from "./service-orders";
 import { getOrderById } from "./service-orders";
 import { OrderSchema } from "./schema.orders";
-import { prisma } from ".../../../prisma/database-prisma";
+import { prisma } from "../../../prisma/database-prisma";
 
 export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
   .get(

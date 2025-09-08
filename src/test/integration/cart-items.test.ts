@@ -17,27 +17,54 @@ describe("CartItems Integration Tests", () => {
     vi.clearAllMocks();
   });
 
-  test("DELETE /cart-items/:id should delete a cart item", async () => {
+  test("DELETE /cart-items/:id should delete a cart item (200)", async () => {
     const mockDeleteItem = {
       id: mockCartId,
       productId: mockProductId,
       quantity: 3,
       deliveryOptionId: "del-1",
     };
-    (CartItemsService.deleteCartItem as Mock).mockResolvedValue({
-      mockDeleteItem,
-    });
+
+    (CartItemsService.deleteCartItem as Mock).mockResolvedValue(mockDeleteItem);
 
     const response = await cartItemsRoute.handle(
       new Request(`${BASE_URL}/${mockCartId}`, { method: "DELETE" })
     );
 
-    if (response.status === 500) {
-      console.error("response 500 body:", await response.text());
-    }
+    expect(response.status).toBe(200);
 
-    expect(response.status).toBe(204);
+    const text = await response.text();
+    expect(text).toBe("");
+
     expect(CartItemsService.deleteCartItem).toHaveBeenCalledWith(mockCartId);
+  });
+
+  test("DELETE /cart-items/:id should return 404 if item not found", async () => {
+    (CartItemsService.deleteCartItem as Mock).mockRejectedValue(
+      new Error("Cart item not found")
+    );
+
+    const response = await cartItemsRoute.handle(
+      new Request(`${BASE_URL}/${mockCartId}`, { method: "DELETE" })
+    );
+
+    expect(response.status).toBe(404);
+    const body = await response.json();
+    expect(body).toEqual({ message: "Cart item not found" });
+  });
+
+  test("DELETE /cart-items/:id should return 404 if item not found", async () => {
+    (CartItemsService.deleteCartItem as Mock).mockRejectedValue(
+      new Error("Cart item not found")
+    );
+
+    const response = await cartItemsRoute.handle(
+      new Request(`${BASE_URL}/${mockCartId}`, { method: "DELETE" })
+    );
+
+    expect(response.status).toBe(404);
+    const body = await response.json();
+    expect(body).toHaveProperty("message", "Cart item not found");
   });
 
   test("GET /cart-items should return a list of cart items", async () => {

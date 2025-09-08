@@ -1,3 +1,4 @@
+/* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import { existsSync } from "fs";
 import { join } from "path";
 import dotenv from "dotenv";

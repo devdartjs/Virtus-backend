@@ -95,13 +95,14 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
     async ({ params, set }) => {
       return record("db.deleteCartItem", async () => {
         try {
-          await CartItemsService.deleteCartItem(params.id);
-          set.status = 204;
+          const deletedItem = await CartItemsService.deleteCartItem(params.id);
+          console.log("deletedItem:", deletedItem);
+          set.status = 200;
           return;
-        } catch (err) {
+        } catch (err: any) {
           console.error("DELETE /cart-items/:id error:", err);
           set.status = 404;
-          throw new Error("Cart item not found");
+          return { message: err.message };
         }
       });
     },

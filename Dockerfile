@@ -22,7 +22,7 @@ RUN apt-get update \
   && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
   && apt-get install -y --no-install-recommends nodejs \
   && apt-get purge -y --auto-remove curl gnupg \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/*  
 
 EXPOSE 3000
 CMD ["sh", "-c", "bunx prisma migrate deploy && bunx prisma generate && bunx prisma db seed && bun src/server.ts"]

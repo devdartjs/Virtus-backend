@@ -307,10 +307,6 @@ describe("service-orders", () => {
       expect(result?.products[0]).not.toHaveProperty("product");
     });
 
-    //
-    // 🔽 NOVOS TESTES 🔽
-    //
-
     test("handles orders with no items", async () => {
       (prisma.order.findUnique as any).mockResolvedValue({
         id: "order-2",

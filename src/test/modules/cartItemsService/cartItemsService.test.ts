@@ -125,11 +125,11 @@ describe("CartItemsService - deleteCartItem", () => {
   });
 
   test("should delete a cart item successfully", async () => {
-    const mockId = "cart-1";
+    const mockId = "550e8400-e29b-41d4-a716-446655440000";
     const mockDeletedItem = {
       id: mockId,
-      productId: "prod-1",
-      quantity: 2,
+      productId: "550e8400-e29b-41d4-a716-446655440001",
+      quantity: 3,
       deliveryOptionId: "del-1",
     };
 
@@ -137,12 +137,13 @@ describe("CartItemsService - deleteCartItem", () => {
       prisma.cartItem.delete as unknown as ReturnType<typeof vi.fn>
     ).mockResolvedValue(mockDeletedItem);
 
-    const result = await CartItemsService.deleteCartItem(mockId);
+    const deletedItem = await CartItemsService.deleteCartItem(mockId);
 
     expect(prisma.cartItem.delete).toHaveBeenCalledWith({
       where: { id: mockId },
     });
-    expect(result).toEqual(mockDeletedItem);
+
+    expect(deletedItem).toEqual(mockDeletedItem);
   });
 
   test("should propagate errors thrown by Prisma", async () => {
