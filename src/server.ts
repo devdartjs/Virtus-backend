@@ -26,7 +26,7 @@ const isDevOrStage = ["development", "stage"].includes(
   process.env.BUN_ENV || ""
 );
 
-const app = new Elysia()
+export const app = new Elysia()
   .use(cors())
   .use(swagger())
   .use(

@@ -6,7 +6,6 @@ import dotenv from "dotenv";
 // 1️⃣ Detecta BUN_ENV de várias fontes
 const envName =
   process.env.BUN_ENV || // variável do processo (cmd/bash)
-  Bun.env.BUN_ENV || // variável carregada pelo Bun
   import.meta.env.BUN_ENV || // variável via import.meta.env
   "development"; // fallback
 
