@@ -85,7 +85,7 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
     {
       body: t.Object({
         productId: t.String({ format: "uuid" }),
-        quantity: t.Integer({ minimum: 1, maximum: 10 }),
+        quantity: t.Integer(),
       }),
       response: CartItemsSchemaT,
     }
