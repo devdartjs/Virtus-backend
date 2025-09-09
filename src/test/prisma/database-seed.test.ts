@@ -9,8 +9,8 @@ vi.mock("../../../prisma/database-prisma", () => ({
     deliveryOption: { count: vi.fn(), createMany: vi.fn() },
     cartItem: { count: vi.fn(), createMany: vi.fn() },
     order: { count: vi.fn(), create: vi.fn() },
-    $disconnect: vi.fn(),
-  },
+    $disconnect: vi.fn()
+  }
 }));
 
 describe("seed function", () => {

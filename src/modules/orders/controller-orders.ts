@@ -24,7 +24,7 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
       }),
     {
       query: OrdersQuerySchema,
-      response: OrdersResponseSchema,
+      response: OrdersResponseSchema
     }
   )
   .get(
@@ -46,17 +46,15 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
           if (set.status !== 404) {
             set.status = 500;
           }
-          throw error instanceof Error
-            ? error
-            : new Error("Failed to fetch order");
+          throw error instanceof Error ? error : new Error("Failed to fetch order");
         }
       }),
     {
       query: OrdersQuerySchema,
       params: t.Object({
-        orderid: t.String({ format: "uuid" }),
+        orderid: t.String({ format: "uuid" })
       }),
-      response: OrderSchema,
+      response: OrderSchema
     }
   )
   .post(
@@ -67,8 +65,8 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
           const cartItems = await prisma.cartItem.findMany({
             include: {
               product: true,
-              deliveryOption: true,
-            },
+              deliveryOption: true
+            }
           });
 
           if (!cartItems || cartItems.length === 0) {
@@ -79,7 +77,7 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
           const cart = cartItems.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
-            deliveryOptionId: item.deliveryOptionId,
+            deliveryOptionId: item.deliveryOptionId
           }));
 
           const order = await createOrder(cart);
@@ -100,16 +98,14 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
                 stars: item.product.stars,
                 ratingCount: item.product.ratingCount,
                 priceCents: item.product.priceCents,
-                keywords: item.product.keywords,
-              },
-            })),
+                keywords: item.product.keywords
+              }
+            }))
           };
         } catch (error) {
           console.error("POST /orders error:", error);
           set.status = 400;
-          throw new Error(
-            error instanceof Error ? error.message : "Failed to create order"
-          );
+          throw new Error(error instanceof Error ? error.message : "Failed to create order");
         }
       }),
     {
@@ -122,7 +118,7 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
             t.Object({
               productId: t.String({ format: "uuid" }),
               quantity: t.Integer(),
-              estimatedDeliveryTimeMs: t.Number(),
+              estimatedDeliveryTimeMs: t.Number()
             }),
             t.Optional(
               t.Object({
@@ -133,13 +129,13 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
                   stars: t.Number(),
                   ratingCount: t.Integer(),
                   priceCents: t.Integer(),
-                  keywords: t.Array(t.String()),
-                }),
+                  keywords: t.Array(t.String())
+                })
               })
-            ),
+            )
           ])
-        ),
-      }),
+        )
+      })
     }
   )
   .delete(
@@ -148,7 +144,7 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
       record("db.deleteOrder", async () => {
         try {
           const order = await prisma.order.findUnique({
-            where: { id: params.id },
+            where: { id: params.id }
           });
 
           console.log(order);
@@ -159,11 +155,11 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
           }
 
           await prisma.orderItem.deleteMany({
-            where: { orderId: params.id },
+            where: { orderId: params.id }
           });
 
           await prisma.order.delete({
-            where: { id: params.id },
+            where: { id: params.id }
           });
 
           return { success: true, message: "Order deleted successfully" };
@@ -175,11 +171,11 @@ export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
       }),
     {
       params: t.Object({
-        id: t.String({ format: "uuid" }),
+        id: t.String({ format: "uuid" })
       }),
       response: t.Object({
         success: t.Boolean(),
-        message: t.String(),
-      }),
+        message: t.String()
+      })
     }
   );

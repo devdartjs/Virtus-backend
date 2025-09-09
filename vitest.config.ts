@@ -11,7 +11,7 @@ export default defineConfig({
       reporter: ["text", "lcov"],
       all: true,
       include: ["src/**/*.ts"],
-      exclude: ["src/**/*.test.ts", "node_modules/**"],
-    },
-  },
+      exclude: ["src/**/*.test.ts", "node_modules/**"]
+    }
+  }
 });

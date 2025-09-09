@@ -5,7 +5,7 @@ import { rateLimiter } from "../../lib/redis/rate-limit";
 const redisMock = vi.hoisted(() => ({
   incr: vi.fn(),
   expire: vi.fn(),
-  ttl: vi.fn(),
+  ttl: vi.fn()
 }));
 
 vi.mock("../../lib/redis/redis", () => ({ default: redisMock, spy: true }));
@@ -60,7 +60,7 @@ describe("rateLimiter() - Unit Tests", () => {
 
     await expect(rateLimiter(ip)).rejects.toMatchObject({
       status: 429,
-      message: errorMessage,
+      message: errorMessage
     });
     expect(redisMock.ttl).toHaveBeenCalledWith(key);
   });
@@ -112,7 +112,7 @@ describe("rateLimiter() - Unit Tests", () => {
     await expect(rateLimiter(ip)).rejects.toThrowError(
       expect.objectContaining({
         status: 429,
-        message: errorMessage,
+        message: errorMessage
       })
     );
     expect(redisMock.ttl).toHaveBeenCalledWith(key);

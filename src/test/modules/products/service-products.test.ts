@@ -16,7 +16,7 @@ describe("ProductService.getAllProducts - Unit Tests", () => {
       stars: 4.5,
       ratingCount: 100,
       priceCents: 10000,
-      keywords: ["product", "category1"],
+      keywords: ["product", "category1"]
     },
     {
       id: "2",
@@ -25,8 +25,8 @@ describe("ProductService.getAllProducts - Unit Tests", () => {
       stars: 4.0,
       ratingCount: 50,
       priceCents: 20000,
-      keywords: ["product", "category2"],
-    },
+      keywords: ["product", "category2"]
+    }
   ];
 
   beforeEach(() => {
@@ -59,9 +59,7 @@ describe("ProductService.getAllProducts - Unit Tests", () => {
   test("should propagate error when getOrSetCache rejects", async () => {
     getOrSetCache.mockRejectedValueOnce(new Error("Cache failure"));
 
-    await expect(ProductService.getAllProducts()).rejects.toThrow(
-      "Cache failure"
-    );
+    await expect(ProductService.getAllProducts()).rejects.toThrow("Cache failure");
     expect(getOrSetCache).toHaveBeenCalledTimes(1);
   });
 });

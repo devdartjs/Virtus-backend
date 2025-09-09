@@ -9,13 +9,13 @@ type ResponseValidationError = {
 
 export const ProductErrorHandler = new Elysia()
   .error({
-    PRODUCT_ERROR: ProductError,
+    PRODUCT_ERROR: ProductError
   })
   .onError(({ code, error }) => {
     if (code === "PRODUCT_ERROR" && error instanceof ProductError) {
       return {
         status: error.status,
-        body: error.toResponse(),
+        body: error.toResponse()
       };
     }
 
@@ -32,8 +32,8 @@ export const ProductErrorHandler = new Elysia()
           message: "Erro na validação da resposta da API",
           code: "RESPONSE_VALIDATION_ERROR",
           summary: (error as any).summary ?? "Erro desconhecido",
-          details: (error as any).errors ?? [],
-        },
+          details: (error as any).errors ?? []
+        }
       };
     }
 
@@ -41,7 +41,7 @@ export const ProductErrorHandler = new Elysia()
       status: 500,
       body: {
         message: "Internal Server Error",
-        code: "INTERNAL_ERROR",
-      },
+        code: "INTERNAL_ERROR"
+      }
     };
   });

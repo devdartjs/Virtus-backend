@@ -17,13 +17,11 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
           if (expand === "product") {
             const allProducts = await ProductService.getAllProducts();
 
-            const productMap = new Map(
-              allProducts.map((product) => [product.id, product])
-            );
+            const productMap = new Map(allProducts.map((product) => [product.id, product]));
 
             cartItems = cartItems.map((item) => ({
               ...item,
-              product: productMap.get(item.productId) || null,
+              product: productMap.get(item.productId) || null
             }));
           }
 
@@ -36,9 +34,9 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
       }),
     {
       query: t.Object({
-        expand: t.Optional(t.Enum({ product: "product" })),
+        expand: t.Optional(t.Enum({ product: "product" }))
       }),
-      response: t.Array(CartItemsSchemaT),
+      response: t.Array(CartItemsSchemaT)
     }
   )
   .post(
@@ -54,7 +52,7 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
 
         const [product, existingItem] = await Promise.all([
           ProductService.getProductById(productId),
-          CartItemsService.findByProductId(productId),
+          CartItemsService.findByProductId(productId)
         ]);
 
         if (!product) {
@@ -64,19 +62,16 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
 
         if (existingItem) {
           const newQuantity = Math.min(existingItem.quantity + quantity, 10);
-          const updated = await CartItemsService.updateCartItem(
-            existingItem.id,
-            {
-              quantity: newQuantity,
-            }
-          );
+          const updated = await CartItemsService.updateCartItem(existingItem.id, {
+            quantity: newQuantity
+          });
           return updated;
         }
 
         const created = await CartItemsService.createCartItem({
           productId,
           quantity,
-          deliveryOptionId: "1",
+          deliveryOptionId: "1"
         });
 
         set.status = 201;
@@ -85,9 +80,9 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
     {
       body: t.Object({
         productId: t.String({ format: "uuid" }),
-        quantity: t.Integer(),
+        quantity: t.Integer()
       }),
-      response: CartItemsSchemaT,
+      response: CartItemsSchemaT
     }
   )
   .delete(
@@ -108,8 +103,8 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
     },
     {
       params: t.Object({
-        id: t.String({ format: "uuid" }),
-      }),
+        id: t.String({ format: "uuid" })
+      })
     }
   )
   .put(
@@ -122,10 +117,7 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
         }
 
         try {
-          const updated = await CartItemsService.updateCartItem(
-            params.id,
-            body
-          );
+          const updated = await CartItemsService.updateCartItem(params.id, body);
           return updated;
         } catch (err: any) {
           console.error("PUT /cart-items/:id error:", err);
@@ -150,12 +142,12 @@ export const cartItemsRoute = new Elysia({ prefix: "/api/v1/cart-items" })
     },
     {
       params: t.Object({
-        id: t.String({ format: "uuid" }),
+        id: t.String({ format: "uuid" })
       }),
       body: t.Object({
         quantity: t.Optional(t.Integer({ minimum: 1, maximum: 10 })),
-        deliveryOptionId: t.Optional(t.String()),
+        deliveryOptionId: t.Optional(t.String())
       }),
-      response: CartItemsSchemaT,
+      response: CartItemsSchemaT
     }
   );

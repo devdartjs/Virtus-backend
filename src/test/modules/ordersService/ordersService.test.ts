@@ -1,9 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import {
-  listOrders,
-  createOrder,
-  getOrderById,
-} from "../../../modules/orders/service-orders";
+import { listOrders, createOrder, getOrderById } from "../../../modules/orders/service-orders";
 
 vi.mock("../../../../prisma/database-prisma", () => ({
   prisma: {
@@ -11,21 +7,21 @@ vi.mock("../../../../prisma/database-prisma", () => ({
       findMany: vi.fn(),
       create: vi.fn(),
       findUnique: vi.fn(),
-      delete: vi.fn(),
+      delete: vi.fn()
     },
     orderItem: {
-      deleteMany: vi.fn(),
+      deleteMany: vi.fn()
     },
     product: {
-      findMany: vi.fn(),
+      findMany: vi.fn()
     },
     deliveryOption: {
-      findMany: vi.fn(),
+      findMany: vi.fn()
     },
     cartItem: {
-      findMany: vi.fn(),
-    },
-  },
+      findMany: vi.fn()
+    }
+  }
 }));
 
 import { prisma } from "../../../../prisma/database-prisma";
@@ -54,11 +50,11 @@ describe("service-orders", () => {
                 stars: 4.5,
                 ratingCount: 100,
                 priceCents: 500,
-                keywords: ["tag1", "tag2"],
-              },
-            },
-          ],
-        },
+                keywords: ["tag1", "tag2"]
+              }
+            }
+          ]
+        }
       ]);
 
       const result = await listOrders(true);
@@ -78,10 +74,10 @@ describe("service-orders", () => {
               productId: "prod-1",
               quantity: 2,
               estimatedDeliveryTimeMs: BigInt(86400000),
-              product: null,
-            },
-          ],
-        },
+              product: null
+            }
+          ]
+        }
       ]);
 
       const result = await listOrders(false);
@@ -107,16 +103,16 @@ describe("service-orders", () => {
               productId: "prod-1",
               quantity: 1,
               estimatedDeliveryTimeMs: BigInt(86400000),
-              product: { id: "prod-1", name: "Product 1" },
+              product: { id: "prod-1", name: "Product 1" }
             },
             {
               productId: "prod-2",
               quantity: 3,
               estimatedDeliveryTimeMs: BigInt(172800000),
-              product: { id: "prod-2", name: "Product 2" },
-            },
-          ],
-        },
+              product: { id: "prod-2", name: "Product 2" }
+            }
+          ]
+        }
       ]);
 
       const result = await listOrders(true);
@@ -135,17 +131,15 @@ describe("service-orders", () => {
               productId: "prod-3",
               quantity: 5,
               estimatedDeliveryTimeMs: BigInt(333),
-              product: null,
-            },
-          ],
-        },
+              product: null
+            }
+          ]
+        }
       ]);
 
       const result = await listOrders(false);
       expect(typeof result[0].orderTimeMs).toBe("number");
-      expect(typeof result[0].products[0].estimatedDeliveryTimeMs).toBe(
-        "number"
-      );
+      expect(typeof result[0].products[0].estimatedDeliveryTimeMs).toBe("number");
     });
   });
 
@@ -157,37 +151,25 @@ describe("service-orders", () => {
     test("throws error when product is missing", async () => {
       (prisma.product.findMany as any).mockResolvedValue([]);
       (prisma.deliveryOption.findMany as any).mockResolvedValue([
-        { id: "del-1", deliveryDays: 2, priceCents: 100 },
+        { id: "del-1", deliveryDays: 2, priceCents: 100 }
       ]);
 
-      const cart = [
-        { productId: "prod-1", quantity: 1, deliveryOptionId: "del-1" },
-      ];
-      await expect(createOrder(cart)).rejects.toThrow(
-        "One or more products not found"
-      );
+      const cart = [{ productId: "prod-1", quantity: 1, deliveryOptionId: "del-1" }];
+      await expect(createOrder(cart)).rejects.toThrow("One or more products not found");
     });
 
     test("throws error when delivery option is missing", async () => {
-      (prisma.product.findMany as any).mockResolvedValue([
-        { id: "prod-1", priceCents: 500 },
-      ]);
+      (prisma.product.findMany as any).mockResolvedValue([{ id: "prod-1", priceCents: 500 }]);
       (prisma.deliveryOption.findMany as any).mockResolvedValue([]);
 
-      const cart = [
-        { productId: "prod-1", quantity: 1, deliveryOptionId: "del-1" },
-      ];
-      await expect(createOrder(cart)).rejects.toThrow(
-        "One or more delivery options not found"
-      );
+      const cart = [{ productId: "prod-1", quantity: 1, deliveryOptionId: "del-1" }];
+      await expect(createOrder(cart)).rejects.toThrow("One or more delivery options not found");
     });
 
     test("creates an order with valid cart", async () => {
-      (prisma.product.findMany as any).mockResolvedValue([
-        { id: "prod-1", priceCents: 500 },
-      ]);
+      (prisma.product.findMany as any).mockResolvedValue([{ id: "prod-1", priceCents: 500 }]);
       (prisma.deliveryOption.findMany as any).mockResolvedValue([
-        { id: "del-1", deliveryDays: 2, priceCents: 100 },
+        { id: "del-1", deliveryDays: 2, priceCents: 100 }
       ]);
       (prisma.order.create as any).mockResolvedValue({
         id: "order-1",
@@ -198,14 +180,12 @@ describe("service-orders", () => {
             productId: "prod-1",
             quantity: 1,
             estimatedDeliveryTimeMs: BigInt(172800000),
-            product: { id: "prod-1", name: "Product 1" },
-          },
-        ],
+            product: { id: "prod-1", name: "Product 1" }
+          }
+        ]
       });
 
-      const cart = [
-        { productId: "prod-1", quantity: 1, deliveryOptionId: "del-1" },
-      ];
+      const cart = [{ productId: "prod-1", quantity: 1, deliveryOptionId: "del-1" }];
       const order = await createOrder(cart);
 
       expect(order.id).toBe("order-1");
@@ -215,11 +195,11 @@ describe("service-orders", () => {
     test("creates order with multiple products", async () => {
       (prisma.product.findMany as any).mockResolvedValue([
         { id: "prod-1", priceCents: 500 },
-        { id: "prod-2", priceCents: 300 },
+        { id: "prod-2", priceCents: 300 }
       ]);
       (prisma.deliveryOption.findMany as any).mockResolvedValue([
         { id: "del-1", deliveryDays: 2, priceCents: 100 },
-        { id: "del-2", deliveryDays: 3, priceCents: 200 },
+        { id: "del-2", deliveryDays: 3, priceCents: 200 }
       ]);
       (prisma.order.create as any).mockResolvedValue({
         id: "order-2",
@@ -230,20 +210,20 @@ describe("service-orders", () => {
             productId: "prod-1",
             quantity: 1,
             estimatedDeliveryTimeMs: BigInt(172800000),
-            product: { id: "prod-1", name: "Product 1" },
+            product: { id: "prod-1", name: "Product 1" }
           },
           {
             productId: "prod-2",
             quantity: 2,
             estimatedDeliveryTimeMs: BigInt(259200000),
-            product: { id: "prod-2", name: "Product 2" },
-          },
-        ],
+            product: { id: "prod-2", name: "Product 2" }
+          }
+        ]
       });
 
       const cart = [
         { productId: "prod-1", quantity: 1, deliveryOptionId: "del-1" },
-        { productId: "prod-2", quantity: 2, deliveryOptionId: "del-2" },
+        { productId: "prod-2", quantity: 2, deliveryOptionId: "del-2" }
       ];
 
       const order = await createOrder(cart);
@@ -278,10 +258,10 @@ describe("service-orders", () => {
               stars: 4.5,
               ratingCount: 100,
               priceCents: 500,
-              keywords: ["tag1", "tag2"],
-            },
-          },
-        ],
+              keywords: ["tag1", "tag2"]
+            }
+          }
+        ]
       });
 
       const result = await getOrderById("order-1", true);
@@ -298,9 +278,9 @@ describe("service-orders", () => {
             productId: "prod-1",
             quantity: 2,
             estimatedDeliveryTimeMs: BigInt(86400000),
-            product: null,
-          },
-        ],
+            product: null
+          }
+        ]
       });
 
       const result = await getOrderById("order-1", false);
@@ -312,7 +292,7 @@ describe("service-orders", () => {
         id: "order-2",
         orderTimeMs: BigInt(987654321),
         totalCostCents: 0,
-        items: [],
+        items: []
       });
 
       const result = await getOrderById("order-2", true);
@@ -336,10 +316,10 @@ describe("service-orders", () => {
               stars: 3.5,
               ratingCount: 20,
               priceCents: 2000,
-              keywords: ["tag3"],
-            },
-          },
-        ],
+              keywords: ["tag3"]
+            }
+          }
+        ]
       });
 
       const result = await getOrderById("order-3", true);
@@ -350,9 +330,7 @@ describe("service-orders", () => {
     test("throws an error if prisma throws", async () => {
       (prisma.order.findUnique as any).mockRejectedValue(new Error("DB error"));
 
-      await expect(getOrderById("order-error", true)).rejects.toThrow(
-        "DB error"
-      );
+      await expect(getOrderById("order-error", true)).rejects.toThrow("DB error");
     });
   });
 });

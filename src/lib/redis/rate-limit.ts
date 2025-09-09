@@ -15,9 +15,7 @@ export async function rateLimiter(ip: string) {
   if (current > max) {
     const ttl = await redis.ttl(key);
     const retryAfter = ttl > 0 ? ttl : window;
-    const error = new Error(
-      `Too many requests. Try again in ${retryAfter} seconds.`
-    );
+    const error = new Error(`Too many requests. Try again in ${retryAfter} seconds.`);
 
     (error as any).status = 429;
     throw error;

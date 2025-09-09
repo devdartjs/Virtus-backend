@@ -3,5 +3,5 @@ import { PgInstrumentation } from "@opentelemetry/instrumentation-pg";
 
 export const instrumentation = opentelemetry({
   instrumentations: [new PgInstrumentation()],
-  spanProcessors: [],
+  spanProcessors: []
 });

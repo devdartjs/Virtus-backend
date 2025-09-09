@@ -22,9 +22,7 @@ if (process.env.BUN_ENV === "stage") {
     .catch((err) => console.error("Error preloading cache:", err));
 }
 
-const isDevOrStage = ["development", "stage"].includes(
-  process.env.BUN_ENV || ""
-);
+const isDevOrStage = ["development", "stage"].includes(process.env.BUN_ENV || "");
 
 export const app = new Elysia()
   .use(cors())
@@ -37,12 +35,12 @@ export const app = new Elysia()
               new BatchSpanProcessor(new ConsoleSpanExporter()),
               new BatchSpanProcessor(
                 new OTLPTraceExporter({
-                  url: "http://localhost:4318/v1/traces",
+                  url: "http://localhost:4318/v1/traces"
                 })
-              ),
+              )
             ]
-          : []),
-      ],
+          : [])
+      ]
     })
   )
   .use(productsRoute)
@@ -59,7 +57,7 @@ export const app = new Elysia()
       userAgent: headers["user-agent"] ?? "unknown",
       host: headers["host"] ?? "unknown",
       protocol: headers["x-forwarded-proto"] ?? "http",
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toISOString()
     };
   })
   .listen(process.env.PORT || 5000);

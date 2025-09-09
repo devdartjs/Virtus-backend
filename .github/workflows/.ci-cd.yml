@@ -1,4 +1,4 @@
-name: CI - Initial
+name: CI
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.bun
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lockb') }}
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
 
       # 3️⃣ Install Bun
       - name: Install Bun
@@ -33,32 +33,72 @@ jobs:
 
       # 4️⃣ Install dependencies
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
+      - name: Reinstall @prisma/client
+        run: bun add @prisma/client
 
       # 5️⃣ Build the app
       - name: Build app
-        run: bun build src/server.ts --outdir dist --target bun
+        run: bun run build:stage
 
       # 6️⃣ Check code format
       - name: Check code format
-        run: bunx prettier --write "src/**/*.ts"
+        run: npx prettier --check src/**/*.ts
 
       # 7️⃣ Lint
       - name: Run ESLint
-        run: bun run lint:fix
+        run: bun run lint
 
       # 8️⃣ Generate Prisma client
       - name: Generate Prisma client
         run: bunx prisma generate
 
-      # 9️⃣ Run unit tests with coverage
+      # 9️⃣ Run unit tests
       - name: Run unit tests with coverage
-        run: bunx vitest run --coverage
+        run: bun run test:unit
+
+  integration-tests:
+    name: Run Integration Tests in Docker
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      # 1️⃣ Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ Create .env from the secret
+      - name: Create .env
+        run: printf "%s\n" "${{ secrets.ENV }}" > .env
+
+      # 3️⃣ Start Docker Compose containers using environment variables
+      - name: Set up Docker Compose
+        env:
+          DATABASE_URL: postgresql://dart:nghk98734@db:5432/postgresdb
+          POSTGRES_USER: dart
+          POSTGRES_PASSWORD: nghk98734
+          POSTGRES_DB: postgresdb
+          PORT: 3000
+        run: docker compose --profile test up --build -d
+
+      # 4️⃣ Run tests in containers
+      - name: Run unit tests
+        run: docker compose exec -T app4 bun run test:unit
+      - name: Run integration tests
+        run: docker compose exec -T app4 bun run test:integration
+
+      # 5️⃣ Tear down Docker containers
+      - name: Tear down containers
+        run: docker compose down --volumes --remove-orphans
+
+      # 6️⃣ Clean up the .env file
+      - name: Cleanup .env
+        run: rm -f .env
 
   build-and-push-image:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
-    needs: build-and-test
+    needs: integration-tests
 
     steps:
       # 1️⃣ Checkout repository
@@ -70,7 +110,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.bun
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lockb') }}
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
 
       # 3️⃣ Install Bun
       - name: Install Bun
@@ -85,9 +125,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # 1️⃣ Create .env from the secret
+      - name: Create .env
+        run: printf "%s\n" "${{ secrets.ENV }}" > .env
+
       # 5️⃣ Build Docker image
       - name: Build Docker image
-        run: docker build -t dartw/virtus-backend:${{ github.sha }} .
+        run: docker build \
+          --build-arg ENV_FILE=.env \
+          -t dartw/virtus-backend:${{ github.sha }} .
 
       # 6️⃣ Tag image as dev
       - name: Tag image
@@ -96,6 +142,9 @@ jobs:
       # 7️⃣ Push Docker images
       - name: Push Docker images
         run: docker push dartw/virtus-backend:${{ github.sha }} && docker push dartw/virtus-backend:dev
+
+      - name: Cleanup .env
+        run: rm -f .env
 
   deploy-stage:
     name: Deploy Stage & Run Post-Deploy Unit Tests
@@ -117,4 +166,4 @@ jobs:
 
       # 4️⃣ Run unit tests on Stage
       - name: Run unit tests on Stage
-        run: bunx vitest run --coverage
+        run: bun run test:coverage

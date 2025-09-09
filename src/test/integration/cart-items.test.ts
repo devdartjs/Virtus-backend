@@ -22,7 +22,7 @@ describe("CartItems Integration Tests", () => {
       id: mockCartId,
       productId: mockProductId,
       quantity: 3,
-      deliveryOptionId: "del-1",
+      deliveryOptionId: "del-1"
     };
 
     (CartItemsService.deleteCartItem as Mock).mockResolvedValue(mockDeleteItem);
@@ -40,9 +40,7 @@ describe("CartItems Integration Tests", () => {
   });
 
   test("DELETE /cart-items/:id should return 404 if item not found", async () => {
-    (CartItemsService.deleteCartItem as Mock).mockRejectedValue(
-      new Error("Cart item not found")
-    );
+    (CartItemsService.deleteCartItem as Mock).mockRejectedValue(new Error("Cart item not found"));
 
     const response = await cartItemsRoute.handle(
       new Request(`${BASE_URL}/${mockCartId}`, { method: "DELETE" })
@@ -54,9 +52,7 @@ describe("CartItems Integration Tests", () => {
   });
 
   test("DELETE /cart-items/:id should return 404 if item not found", async () => {
-    (CartItemsService.deleteCartItem as Mock).mockRejectedValue(
-      new Error("Cart item not found")
-    );
+    (CartItemsService.deleteCartItem as Mock).mockRejectedValue(new Error("Cart item not found"));
 
     const response = await cartItemsRoute.handle(
       new Request(`${BASE_URL}/${mockCartId}`, { method: "DELETE" })
@@ -73,15 +69,13 @@ describe("CartItems Integration Tests", () => {
         id: mockCartId,
         productId: mockProductId,
         quantity: 2,
-        deliveryOptionId: "del-1",
-      },
+        deliveryOptionId: "del-1"
+      }
     ];
 
     (CartItemsService.getCartItems as Mock).mockResolvedValue(mockItems);
 
-    const response = await cartItemsRoute.handle(
-      new Request(`${BASE_URL}`, { method: "GET" })
-    );
+    const response = await cartItemsRoute.handle(new Request(`${BASE_URL}`, { method: "GET" }));
 
     expect(response.status).toBe(200);
     const body = await response.json();
@@ -95,8 +89,8 @@ describe("CartItems Integration Tests", () => {
         id: mockCartId,
         productId: mockProductId,
         quantity: 2,
-        deliveryOptionId: "del-1",
-      },
+        deliveryOptionId: "del-1"
+      }
     ];
 
     const mockProducts = [
@@ -107,15 +101,15 @@ describe("CartItems Integration Tests", () => {
         stars: 4.5,
         ratingCount: 87,
         priceCents: 1090,
-        keywords: ["sample", "mock"],
-      },
+        keywords: ["sample", "mock"]
+      }
     ];
 
     (CartItemsService.getCartItems as Mock).mockResolvedValue(mockItems);
     (ProductService.getAllProducts as Mock).mockResolvedValue(mockProducts);
 
     const request = new Request(`${BASE_URL}?expand=product`, {
-      method: "GET",
+      method: "GET"
     });
     const response = await cartItemsRoute.handle(request);
 
@@ -127,13 +121,9 @@ describe("CartItems Integration Tests", () => {
   });
 
   test("GET /cart-items should return 500 on service failure", async () => {
-    (CartItemsService.getCartItems as Mock).mockRejectedValue(
-      new Error("DB error")
-    );
+    (CartItemsService.getCartItems as Mock).mockRejectedValue(new Error("DB error"));
 
-    const response = await cartItemsRoute.handle(
-      new Request(`${BASE_URL}`, { method: "GET" })
-    );
+    const response = await cartItemsRoute.handle(new Request(`${BASE_URL}`, { method: "GET" }));
 
     expect(response.status).toBe(500);
     const body = await response.text();
@@ -146,20 +136,18 @@ describe("CartItems Integration Tests", () => {
       id: mockCartId,
       productId: mockProductId,
       quantity: 3,
-      deliveryOptionId: "1",
+      deliveryOptionId: "1"
     };
 
     (ProductService.getProductById as Mock).mockResolvedValue(mockProduct);
     (CartItemsService.findByProductId as Mock).mockResolvedValue(null);
-    (CartItemsService.createCartItem as Mock).mockResolvedValue(
-      mockCreatedItem
-    );
+    (CartItemsService.createCartItem as Mock).mockResolvedValue(mockCreatedItem);
 
     const response = await cartItemsRoute.handle(
       new Request(`${BASE_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: mockProductId, quantity: 3 }),
+        body: JSON.stringify({ productId: mockProductId, quantity: 3 })
       })
     );
 
@@ -169,7 +157,7 @@ describe("CartItems Integration Tests", () => {
     expect(CartItemsService.createCartItem).toHaveBeenCalledWith({
       productId: mockProductId,
       quantity: 3,
-      deliveryOptionId: "1",
+      deliveryOptionId: "1"
     });
   });
 
@@ -178,7 +166,7 @@ describe("CartItems Integration Tests", () => {
       new Request(`${BASE_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: mockProductId, quantity: 0 }),
+        body: JSON.stringify({ productId: mockProductId, quantity: 0 })
       })
     );
 
@@ -192,7 +180,7 @@ describe("CartItems Integration Tests", () => {
       new Request(`${BASE_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: mockProductId, quantity: 11 }),
+        body: JSON.stringify({ productId: mockProductId, quantity: 11 })
       })
     );
 
@@ -208,7 +196,7 @@ describe("CartItems Integration Tests", () => {
       new Request(`${BASE_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: mockProductId, quantity: 2 }),
+        body: JSON.stringify({ productId: mockProductId, quantity: 2 })
       })
     );
 
@@ -222,13 +210,13 @@ describe("CartItems Integration Tests", () => {
       id: mockCartId,
       productId: mockProductId,
       quantity: 9,
-      deliveryOptionId: "1",
+      deliveryOptionId: "1"
     };
     const updatedItem = { ...existingItem, quantity: 10 };
 
     (ProductService.getProductById as Mock).mockResolvedValue({
       id: mockProductId,
-      name: "P1",
+      name: "P1"
     });
     (CartItemsService.findByProductId as Mock).mockResolvedValue(existingItem);
     (CartItemsService.updateCartItem as Mock).mockResolvedValue(updatedItem);
@@ -237,7 +225,7 @@ describe("CartItems Integration Tests", () => {
       new Request(`${BASE_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: mockProductId, quantity: 5 }),
+        body: JSON.stringify({ productId: mockProductId, quantity: 5 })
       })
     );
 
@@ -245,7 +233,7 @@ describe("CartItems Integration Tests", () => {
     const body = await response.json();
     expect(body.quantity).toBe(10);
     expect(CartItemsService.updateCartItem).toHaveBeenCalledWith(mockCartId, {
-      quantity: 10,
+      quantity: 10
     });
   });
 
@@ -254,18 +242,16 @@ describe("CartItems Integration Tests", () => {
       id: mockCartId,
       productId: mockProductId,
       quantity: 5,
-      deliveryOptionId: "del-1",
+      deliveryOptionId: "del-1"
     };
 
-    (CartItemsService.updateCartItem as Mock).mockResolvedValue(
-      mockUpdatedItem
-    );
+    (CartItemsService.updateCartItem as Mock).mockResolvedValue(mockUpdatedItem);
 
     const response = await cartItemsRoute.handle(
       new Request(`${BASE_URL}/${mockCartId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity: 5 }),
+        body: JSON.stringify({ quantity: 5 })
       })
     );
 
@@ -273,7 +259,7 @@ describe("CartItems Integration Tests", () => {
     const body = await response.json();
     expect(body).toEqual(mockUpdatedItem);
     expect(CartItemsService.updateCartItem).toHaveBeenCalledWith(mockCartId, {
-      quantity: 5,
+      quantity: 5
     });
   });
 
@@ -282,7 +268,7 @@ describe("CartItems Integration Tests", () => {
       new Request(`${BASE_URL}/${mockCartId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({})
       })
     );
 
@@ -293,14 +279,14 @@ describe("CartItems Integration Tests", () => {
 
   test("PUT /cart-items/:id should return 404 for P2025 error", async () => {
     (CartItemsService.updateCartItem as Mock).mockRejectedValue({
-      code: "P2025",
+      code: "P2025"
     });
 
     const response = await cartItemsRoute.handle(
       new Request(`${BASE_URL}/${mockCartId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity: 5 }),
+        body: JSON.stringify({ quantity: 5 })
       })
     );
 
@@ -312,14 +298,14 @@ describe("CartItems Integration Tests", () => {
   test("PUT /cart-items/:id should return 400 for P2003 deliveryOptionId error", async () => {
     (CartItemsService.updateCartItem as Mock).mockRejectedValue({
       code: "P2003",
-      meta: { field_name: "deliveryOptionId" },
+      meta: { field_name: "deliveryOptionId" }
     });
 
     const response = await cartItemsRoute.handle(
       new Request(`${BASE_URL}/${mockCartId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deliveryOptionId: "invalid-id" }),
+        body: JSON.stringify({ deliveryOptionId: "invalid-id" })
       })
     );
 
@@ -331,14 +317,14 @@ describe("CartItems Integration Tests", () => {
   test("PUT /cart-items/:id should return 400 for P2003 generic foreign key error", async () => {
     (CartItemsService.updateCartItem as Mock).mockRejectedValue({
       code: "P2003",
-      meta: { field_name: "productId" },
+      meta: { field_name: "productId" }
     });
 
     const response = await cartItemsRoute.handle(
       new Request(`${BASE_URL}/${mockCartId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deliveryOptionId: "invalid-ref" }),
+        body: JSON.stringify({ deliveryOptionId: "invalid-ref" })
       })
     );
 
@@ -348,15 +334,13 @@ describe("CartItems Integration Tests", () => {
   });
 
   test("PUT /cart-items/:id should return 500 on unexpected error", async () => {
-    (CartItemsService.updateCartItem as Mock).mockRejectedValue(
-      new Error("DB crash")
-    );
+    (CartItemsService.updateCartItem as Mock).mockRejectedValue(new Error("DB crash"));
 
     const response = await cartItemsRoute.handle(
       new Request(`${BASE_URL}/${mockCartId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity: 2 }),
+        body: JSON.stringify({ quantity: 2 })
       })
     );
 

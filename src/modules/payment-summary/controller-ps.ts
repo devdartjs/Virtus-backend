@@ -3,15 +3,15 @@ import { Elysia } from "elysia";
 import { prisma } from "../../../prisma/database-prisma";
 
 export const getPaymentSummaryRoute = new Elysia({
-  prefix: "/api/v1/payment-summary",
+  prefix: "/api/v1/payment-summary"
 }).get("/", async () => {
   const TAX_RATE = 0.1;
 
   const cartItems = await prisma.cartItem.findMany({
     include: {
       product: true,
-      deliveryOption: true,
-    },
+      deliveryOption: true
+    }
   });
 
   let totalItems = 0;
@@ -34,6 +34,6 @@ export const getPaymentSummaryRoute = new Elysia({
     shippingCostCents,
     totalCostBeforeTaxCents,
     taxCents,
-    totalCostCents,
+    totalCostCents
   };
 });

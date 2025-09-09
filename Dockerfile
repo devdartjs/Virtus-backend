@@ -7,9 +7,12 @@ RUN bun install --frozen-lockfile
 
 COPY prisma ./prisma
 COPY src ./src
-COPY .env ./
-COPY .env.stage ./
-RUN bun run build
+# COPY .env .
+# COPY .env.stage .
+# RUN bun run build
+ARG ENV_FILE
+COPY ${ENV_FILE} .env
+RUN bun run build:stage
 
 # Runtime
 FROM oven/bun:1.1.13-slim AS runtime

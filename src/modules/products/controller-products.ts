@@ -7,7 +7,7 @@ import { rateLimiter } from "../../lib/redis/rate-limit";
 
 export const productsRoute = new Elysia({ prefix: "/api/v1/products" })
   .error({
-    PRODUCT_ERROR: ProductError,
+    PRODUCT_ERROR: ProductError
   })
   .onError(({ code, error }) => {
     if (code === "PRODUCT_ERROR" && error instanceof ProductError) {
@@ -17,7 +17,7 @@ export const productsRoute = new Elysia({ prefix: "/api/v1/products" })
     if (error instanceof Error && (error as any).status === 429) {
       return {
         status: 429,
-        body: { message: error.message, code: "RATE_LIMIT_EXCEEDED" },
+        body: { message: error.message, code: "RATE_LIMIT_EXCEEDED" }
       };
     }
 
@@ -34,14 +34,14 @@ export const productsRoute = new Elysia({ prefix: "/api/v1/products" })
           message: "Error validating API response",
           code: "RESPONSE_VALIDATION_ERROR",
           summary: (error as any).summary ?? "Unknown error",
-          details: (error as any).errors ?? [],
-        },
+          details: (error as any).errors ?? []
+        }
       };
     }
 
     return {
       status: 500,
-      body: { message: "Internal Server Error", code: "INTERNAL_ERROR" },
+      body: { message: "Internal Server Error", code: "INTERNAL_ERROR" }
     };
   })
   .get(
@@ -73,8 +73,8 @@ export const productsRoute = new Elysia({ prefix: "/api/v1/products" })
       response: t.Object({
         success: t.Boolean(),
         total: t.Number(),
-        products: t.Array(ProductSchemaT),
-      }),
+        products: t.Array(ProductSchemaT)
+      })
     }
   )
   .get(
@@ -106,7 +106,7 @@ export const productsRoute = new Elysia({ prefix: "/api/v1/products" })
     {
       response: t.Object({
         success: t.Boolean(),
-        product: ProductSchemaT,
-      }),
+        product: ProductSchemaT
+      })
     }
   );

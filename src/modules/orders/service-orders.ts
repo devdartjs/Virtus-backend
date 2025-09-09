@@ -5,10 +5,10 @@ export async function listOrders(expandProduct: boolean) {
     include: {
       items: {
         include: {
-          product: expandProduct,
-        },
-      },
-    },
+          product: expandProduct
+        }
+      }
+    }
   });
 
   return orders.map((order) => ({
@@ -19,7 +19,7 @@ export async function listOrders(expandProduct: boolean) {
       const base = {
         productId: item.productId,
         quantity: item.quantity,
-        estimatedDeliveryTimeMs: Number(item.estimatedDeliveryTimeMs),
+        estimatedDeliveryTimeMs: Number(item.estimatedDeliveryTimeMs)
       };
 
       if (expandProduct && item.product) {
@@ -32,13 +32,13 @@ export async function listOrders(expandProduct: boolean) {
             stars: item.product.stars,
             ratingCount: item.product.ratingCount,
             priceCents: item.product.priceCents,
-            keywords: item.product.keywords,
-          },
+            keywords: item.product.keywords
+          }
         };
       }
 
       return base;
-    }),
+    })
   }));
 }
 
@@ -49,15 +49,15 @@ export async function createOrder(
     deliveryOptionId: string;
   }[]
 ) {
-  if (!cart.length) {throw new Error("Cart cannot be empty");}
+  if (!cart.length) {
+    throw new Error("Cart cannot be empty");
+  }
 
   const productIds = [...new Set(cart.map((item) => item.productId))];
-  const deliveryOptionIds = [
-    ...new Set(cart.map((item) => item.deliveryOptionId)),
-  ];
+  const deliveryOptionIds = [...new Set(cart.map((item) => item.deliveryOptionId))];
 
   const products = await prisma.product.findMany({
-    where: { id: { in: productIds } },
+    where: { id: { in: productIds } }
   });
 
   if (products.length !== productIds.length) {
@@ -65,7 +65,7 @@ export async function createOrder(
   }
 
   const deliveryOptions = await prisma.deliveryOption.findMany({
-    where: { id: { in: deliveryOptionIds } },
+    where: { id: { in: deliveryOptionIds } }
   });
 
   if (deliveryOptions.length !== deliveryOptionIds.length) {
@@ -81,8 +81,7 @@ export async function createOrder(
     const product = productMap.get(item.productId)!;
     const deliveryOption = deliveryOptionMap.get(item.deliveryOptionId)!;
 
-    const itemCost =
-      product.priceCents * item.quantity + deliveryOption.priceCents;
+    const itemCost = product.priceCents * item.quantity + deliveryOption.priceCents;
     totalCostCents += itemCost;
   }
 
@@ -95,25 +94,23 @@ export async function createOrder(
       items: {
         create: cart.map((item) => {
           const deliveryOption = deliveryOptionMap.get(item.deliveryOptionId)!;
-          const estimatedDeliveryTimeMs = BigInt(
-            deliveryOption.deliveryDays * 24 * 60 * 60 * 1000
-          );
+          const estimatedDeliveryTimeMs = BigInt(deliveryOption.deliveryDays * 24 * 60 * 60 * 1000);
 
           return {
             productId: item.productId,
             quantity: item.quantity,
-            estimatedDeliveryTimeMs,
+            estimatedDeliveryTimeMs
           };
-        }),
-      },
+        })
+      }
     },
     include: {
       items: {
         include: {
-          product: true,
-        },
-      },
-    },
+          product: true
+        }
+      }
+    }
   });
 
   return order;
@@ -125,13 +122,15 @@ export async function getOrderById(orderId: string, expandProduct: boolean) {
     include: {
       items: {
         include: {
-          product: expandProduct,
-        },
-      },
-    },
+          product: expandProduct
+        }
+      }
+    }
   });
 
-  if (!order) {return null;}
+  if (!order) {
+    return null;
+  }
 
   return {
     id: order.id,
@@ -141,7 +140,7 @@ export async function getOrderById(orderId: string, expandProduct: boolean) {
       const base = {
         productId: item.productId,
         quantity: item.quantity,
-        estimatedDeliveryTimeMs: Number(item.estimatedDeliveryTimeMs),
+        estimatedDeliveryTimeMs: Number(item.estimatedDeliveryTimeMs)
       };
 
       if (expandProduct && item.product) {
@@ -154,12 +153,12 @@ export async function getOrderById(orderId: string, expandProduct: boolean) {
             stars: item.product.stars,
             ratingCount: item.product.ratingCount,
             priceCents: item.product.priceCents,
-            keywords: item.product.keywords,
-          },
+            keywords: item.product.keywords
+          }
         };
       }
 
       return base;
-    }),
+    })
   };
 }

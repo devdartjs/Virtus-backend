@@ -19,10 +19,7 @@ describe("Reset Route Integration", () => {
     );
     expect(response.status).toBe(200);
     const data = await response.json();
-    expect(data).toHaveProperty(
-      "message",
-      "Database reset and seeded successfully"
-    );
+    expect(data).toHaveProperty("message", "Database reset and seeded successfully");
 
     const products = await prisma.product.findMany();
     expect(products.length).toBeGreaterThan(0);

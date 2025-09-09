@@ -4,12 +4,12 @@ import { getOrSetCache } from "../../lib/redis/cache";
 
 const redisMock = vi.hoisted(() => ({
   get: vi.fn(),
-  setex: vi.fn(),
+  setex: vi.fn()
 }));
 
 vi.mock("../../lib/redis/redis", () => ({
   default: redisMock,
-  spy: true,
+  spy: true
 }));
 
 beforeEach(() => {
@@ -45,11 +45,7 @@ describe("getOrSetCache() function - Unit Tests", () => {
     expect(result).toEqual(data);
     expect(redisMock.get).toHaveBeenCalledWith(key);
     expect(fetcher).toHaveBeenCalled();
-    expect(redisMock.setex).toHaveBeenCalledWith(
-      key,
-      120,
-      JSON.stringify(data)
-    );
+    expect(redisMock.setex).toHaveBeenCalledWith(key, 120, JSON.stringify(data));
   });
 
   test("uses default TTL from env when not specified", async () => {
@@ -66,9 +62,7 @@ describe("getOrSetCache() function - Unit Tests", () => {
     const failingFetcher = vi.fn().mockRejectedValue(fetcherError);
     redisMock.get.mockResolvedValueOnce(null);
 
-    await expect(getOrSetCache(key, failingFetcher)).rejects.toThrow(
-      "DB failure"
-    );
+    await expect(getOrSetCache(key, failingFetcher)).rejects.toThrow("DB failure");
     expect(redisMock.setex).not.toHaveBeenCalled();
   });
 
@@ -81,9 +75,7 @@ describe("getOrSetCache() function - Unit Tests", () => {
 
     redisMock.get.mockResolvedValueOnce(null);
     await getOrSetCache(key, fetcher, 30);
-    expect(logSpy).toHaveBeenCalledWith(
-      `🟡 Cache miss: ${key}. Fetching from DB...`
-    );
+    expect(logSpy).toHaveBeenCalledWith(`🟡 Cache miss: ${key}. Fetching from DB...`);
 
     logSpy.mockRestore();
   });

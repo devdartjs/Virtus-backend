@@ -10,7 +10,7 @@ export class ProductError extends Error {
   toResponse() {
     return {
       message: this.message,
-      code: this.code,
+      code: this.code
     };
   }
 }

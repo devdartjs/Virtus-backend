@@ -13,8 +13,8 @@ beforeAll(async () => {
   await prisma.deliveryOption.createMany({
     data: [
       { id: "fast", deliveryDays: 3, priceCents: 500 },
-      { id: "standard", deliveryDays: 7, priceCents: 0 },
-    ],
+      { id: "standard", deliveryDays: 7, priceCents: 0 }
+    ]
   });
 
   app = new Elysia().use(deliveryOptionsRoute);
@@ -27,32 +27,26 @@ describe("Delivery Options Integration", () => {
   test("GET /api/v1/delivery-options should return delivery options-", async () => {
     const response = await app.handle(
       new Request("http://localhost/api/v1/delivery-options", {
-        method: "GET",
+        method: "GET"
       })
     );
     expect(response.status).toBe(200);
     const body = await response.json();
-    console.log(
-      "BODY => TEST: GET /api/v1/delivery-options should return delivery options",
-      body
-    );
+    console.log("BODY => TEST: GET /api/v1/delivery-options should return delivery options", body);
 
     expect(body).toHaveLength(2);
     expect(body[0]).toMatchObject({
       id: "fast",
       deliveryDays: 3,
-      priceCents: 500,
+      priceCents: 500
     });
   });
 
   test("GET /api/v1/delivery-options?expand=estimatedDeliveryTime should includes calculated field", async () => {
     const response = await app.handle(
-      new Request(
-        "http://localhost/api/v1/delivery-options?expand=estimatedDeliveryTime",
-        {
-          method: "GET",
-        }
-      )
+      new Request("http://localhost/api/v1/delivery-options?expand=estimatedDeliveryTime", {
+        method: "GET"
+      })
     );
     expect(response.status).toBe(200);
     const body = await response.json();
@@ -71,7 +65,7 @@ describe("Delivery Options Integration", () => {
 
     const response = await app.handle(
       new Request("http://localhost/api/v1/delivery-options", {
-        method: "GET",
+        method: "GET"
       })
     );
     expect(response.status).toBe(500);

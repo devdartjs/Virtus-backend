@@ -6,5 +6,5 @@ export const CartItemsSchemaT = t.Object({
   productId: t.String(),
   quantity: t.Number(),
   deliveryOptionId: t.String(),
-  product: t.Optional(ProductSchemaT),
+  product: t.Optional(ProductSchemaT)
 });

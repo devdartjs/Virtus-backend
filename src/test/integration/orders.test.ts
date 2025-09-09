@@ -9,21 +9,21 @@ vi.mock("../../../prisma/database-prisma", () => ({
     order: {
       findMany: vi.fn(),
       findUnique: vi.fn(),
-      delete: vi.fn(),
+      delete: vi.fn()
     },
     orderItem: {
-      deleteMany: vi.fn(),
+      deleteMany: vi.fn()
     },
     product: {
-      findMany: vi.fn(),
+      findMany: vi.fn()
     },
     deliveryOption: {
-      findMany: vi.fn(),
+      findMany: vi.fn()
     },
     cartItem: {
-      findMany: vi.fn(),
-    },
-  },
+      findMany: vi.fn()
+    }
+  }
 }));
 
 describe("GET /api/v1/orders", () => {
@@ -52,17 +52,16 @@ describe("GET /api/v1/orders", () => {
               stars: 5,
               ratingCount: 10,
               priceCents: 1500,
-              keywords: ["tag1"],
-            },
-          },
-        ],
-      },
+              keywords: ["tag1"]
+            }
+          }
+        ]
+      }
     ]);
 
-    const request = new Request(
-      "http://localhost:3004/api/v1/orders?expand=products",
-      { method: "GET" }
-    );
+    const request = new Request("http://localhost:3004/api/v1/orders?expand=products", {
+      method: "GET"
+    });
     const response = await testApp.handle(request);
     const body = await response.json();
     console.log("body-test-1:", body);
@@ -85,11 +84,11 @@ describe("GET /api/v1/orders", () => {
               stars: 5,
               ratingCount: 10,
               priceCents: 1500,
-              keywords: ["tag1"],
-            },
-          },
-        ],
-      },
+              keywords: ["tag1"]
+            }
+          }
+        ]
+      }
     ]);
   });
 
@@ -97,7 +96,7 @@ describe("GET /api/v1/orders", () => {
     (prisma.order.findMany as any).mockResolvedValue([]);
 
     const request = new Request("http://localhost:3004/api/v1/orders", {
-      method: "GET",
+      method: "GET"
     });
     const response = await testApp.handle(request);
     const body = await response.json();
@@ -125,8 +124,8 @@ describe("GET /api/v1/orders", () => {
               stars: 5,
               ratingCount: 10,
               priceCents: 500,
-              keywords: ["electronics"],
-            },
+              keywords: ["electronics"]
+            }
           },
           {
             productId: "33333333-3333-3333-3333-333333333333",
@@ -139,10 +138,10 @@ describe("GET /api/v1/orders", () => {
               stars: 4,
               ratingCount: 8,
               priceCents: 250,
-              keywords: ["accessory"],
-            },
-          },
-        ],
+              keywords: ["accessory"]
+            }
+          }
+        ]
       },
       {
         id: "44444444-4444-4444-4444-444444444444",
@@ -160,15 +159,15 @@ describe("GET /api/v1/orders", () => {
               stars: 3,
               ratingCount: 7,
               priceCents: 2000,
-              keywords: ["premium"],
-            },
-          },
-        ],
-      },
+              keywords: ["premium"]
+            }
+          }
+        ]
+      }
     ]);
 
     const request = new Request("http://localhost:3004/api/v1/orders", {
-      method: "GET",
+      method: "GET"
     });
     const response = await testApp.handle(request);
     const body = await response.json();
@@ -185,14 +184,14 @@ describe("GET /api/v1/orders", () => {
           {
             productId: "22222222-2222-2222-2222-222222222222",
             quantity: 1,
-            estimatedDeliveryTimeMs: 86400000,
+            estimatedDeliveryTimeMs: 86400000
           },
           {
             productId: "33333333-3333-3333-3333-333333333333",
             quantity: 2,
-            estimatedDeliveryTimeMs: 172800000,
-          },
-        ],
+            estimatedDeliveryTimeMs: 172800000
+          }
+        ]
       },
       {
         id: "44444444-4444-4444-4444-444444444444",
@@ -202,10 +201,10 @@ describe("GET /api/v1/orders", () => {
           {
             productId: "55555555-5555-5555-5555-555555555555",
             quantity: 1,
-            estimatedDeliveryTimeMs: 43200000,
-          },
-        ],
-      },
+            estimatedDeliveryTimeMs: 43200000
+          }
+        ]
+      }
     ]);
   });
 
@@ -227,8 +226,8 @@ describe("GET /api/v1/orders", () => {
               stars: 5,
               ratingCount: 10,
               priceCents: 500,
-              keywords: ["electronics"],
-            },
+              keywords: ["electronics"]
+            }
           },
           {
             productId: "33333333-3333-3333-3333-333333333333",
@@ -241,10 +240,10 @@ describe("GET /api/v1/orders", () => {
               stars: 4,
               ratingCount: 8,
               priceCents: 250,
-              keywords: ["accessory"],
-            },
-          },
-        ],
+              keywords: ["accessory"]
+            }
+          }
+        ]
       },
       {
         id: "44444444-4444-4444-4444-444444444444",
@@ -262,17 +261,16 @@ describe("GET /api/v1/orders", () => {
               stars: 3,
               ratingCount: 7,
               priceCents: 2000,
-              keywords: ["premium"],
-            },
-          },
-        ],
-      },
+              keywords: ["premium"]
+            }
+          }
+        ]
+      }
     ]);
 
-    const request = new Request(
-      "http://localhost:3004/api/v1/orders?expand=products",
-      { method: "GET" }
-    );
+    const request = new Request("http://localhost:3004/api/v1/orders?expand=products", {
+      method: "GET"
+    });
     const response = await testApp.handle(request);
     const body = await response.json();
     console.log("body-test-4:", body);
@@ -289,14 +287,13 @@ describe("GET /api/v1/orders", () => {
         id: "66666666-6666-6666-6666-666666666666",
         orderTimeMs: BigInt(999999999),
         totalCostCents: 0,
-        items: [],
-      },
+        items: []
+      }
     ]);
 
-    const request = new Request(
-      "http://localhost:3004/api/v1/orders?expand=products",
-      { method: "GET" }
-    );
+    const request = new Request("http://localhost:3004/api/v1/orders?expand=products", {
+      method: "GET"
+    });
     const response = await testApp.handle(request);
     const body = await response.json();
 
@@ -306,8 +303,8 @@ describe("GET /api/v1/orders", () => {
         id: "66666666-6666-6666-6666-666666666666",
         orderTimeMs: 999999999,
         totalCostCents: 0,
-        products: [],
-      },
+        products: []
+      }
     ]);
   });
 
@@ -315,7 +312,7 @@ describe("GET /api/v1/orders", () => {
     (prisma.order.findMany as any).mockRejectedValue(new Error("DB error"));
 
     const request = new Request("http://localhost:3004/api/v1/orders", {
-      method: "GET",
+      method: "GET"
     });
     const response = await testApp.handle(request);
 
@@ -348,10 +345,10 @@ describe("GET /api/v1/orders/:orderid", () => {
             stars: 5,
             ratingCount: 10,
             priceCents: 1500,
-            keywords: ["tag1"],
-          },
-        },
-      ],
+            keywords: ["tag1"]
+          }
+        }
+      ]
     });
 
     const request = new Request(
@@ -379,10 +376,10 @@ describe("GET /api/v1/orders/:orderid", () => {
             stars: 5,
             ratingCount: 10,
             priceCents: 1500,
-            keywords: ["tag1"],
-          },
-        },
-      ],
+            keywords: ["tag1"]
+          }
+        }
+      ]
     });
   });
 
@@ -403,10 +400,10 @@ describe("GET /api/v1/orders/:orderid", () => {
             stars: 4,
             ratingCount: 8,
             priceCents: 1000,
-            keywords: ["accessory"],
-          },
-        },
-      ],
+            keywords: ["accessory"]
+          }
+        }
+      ]
     });
 
     const request = new Request(
@@ -426,9 +423,9 @@ describe("GET /api/v1/orders/:orderid", () => {
         {
           productId: "44444444-4444-4444-4444-444444444444",
           quantity: 2,
-          estimatedDeliveryTimeMs: 43200000,
-        },
-      ],
+          estimatedDeliveryTimeMs: 43200000
+        }
+      ]
     });
   });
 
@@ -471,7 +468,7 @@ describe("DELETE /api/v1/orders/:id", () => {
 
   test("should delete order successfully", async () => {
     (prisma.order.findUnique as any).mockResolvedValue({
-      id: "11111111-1111-1111-1111-111111111111",
+      id: "11111111-1111-1111-1111-111111111111"
     });
     (prisma.orderItem.deleteMany as any).mockResolvedValue({});
     (prisma.order.delete as any).mockResolvedValue({});
@@ -486,28 +483,26 @@ describe("DELETE /api/v1/orders/:id", () => {
     expect(response.status).toBe(200);
     expect(body).toEqual({
       success: true,
-      message: "Order deleted successfully",
+      message: "Order deleted successfully"
     });
 
     expect(prisma.order.findUnique).toHaveBeenCalledWith({
-      where: { id: "11111111-1111-1111-1111-111111111111" },
+      where: { id: "11111111-1111-1111-1111-111111111111" }
     });
     expect(prisma.orderItem.deleteMany).toHaveBeenCalledWith({
-      where: { orderId: "11111111-1111-1111-1111-111111111111" },
+      where: { orderId: "11111111-1111-1111-1111-111111111111" }
     });
     expect(prisma.order.delete).toHaveBeenCalledWith({
-      where: { id: "11111111-1111-1111-1111-111111111111" },
+      where: { id: "11111111-1111-1111-1111-111111111111" }
     });
   });
 
   test("should return 500 when prisma.delete throws an error", async () => {
     (prisma.order.findUnique as any).mockResolvedValue({
-      id: "33333333-3333-3333-3333-333333333333",
+      id: "33333333-3333-3333-3333-333333333333"
     });
     (prisma.orderItem.deleteMany as any).mockResolvedValue({});
-    (prisma.order.delete as any).mockRejectedValue(
-      new Error("DB delete error")
-    );
+    (prisma.order.delete as any).mockRejectedValue(new Error("DB delete error"));
 
     const request = new Request(
       "http://localhost:3004/api/v1/orders/33333333-3333-3333-3333-333333333333",

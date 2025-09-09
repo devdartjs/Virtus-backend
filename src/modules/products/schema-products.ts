@@ -7,5 +7,5 @@ export const ProductSchemaT = t.Object({
   stars: t.Number({ minimum: 0, maximum: 5 }),
   ratingCount: t.Integer({ minimum: 0 }),
   priceCents: t.Integer({ minimum: 0 }),
-  keywords: t.Array(t.String()),
+  keywords: t.Array(t.String())
 });

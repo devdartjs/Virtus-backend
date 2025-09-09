@@ -9,25 +9,25 @@ vi.mock("../../../prisma/database-prisma", () => ({
   prisma: {
     order: {
       findMany: vi.fn(),
-      findUnique: vi.fn(),
+      findUnique: vi.fn()
     },
     orderItem: {
-      deleteMany: vi.fn(),
+      deleteMany: vi.fn()
     },
     product: {
-      findMany: vi.fn(),
+      findMany: vi.fn()
     },
     deliveryOption: {
-      findMany: vi.fn(),
+      findMany: vi.fn()
     },
     cartItem: {
-      findMany: vi.fn(),
-    },
-  },
+      findMany: vi.fn()
+    }
+  }
 }));
 
 vi.mock("../../modules/orders/service-orders.ts", () => ({
-  createOrder: vi.fn(),
+  createOrder: vi.fn()
 }));
 
 describe("POST /api/v1/orders", () => {
@@ -51,10 +51,10 @@ describe("POST /api/v1/orders", () => {
           stars: 5,
           ratingCount: 10,
           priceCents: 500,
-          keywords: ["electronics"],
+          keywords: ["electronics"]
         },
-        deliveryOptionId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-      },
+        deliveryOptionId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+      }
     ]);
 
     (createOrder as any).mockResolvedValue({
@@ -73,14 +73,14 @@ describe("POST /api/v1/orders", () => {
             stars: 5,
             ratingCount: 10,
             priceCents: 500,
-            keywords: ["electronics"],
-          },
-        },
-      ],
+            keywords: ["electronics"]
+          }
+        }
+      ]
     });
 
     const request = new Request("http://localhost:3004/api/v1/orders", {
-      method: "POST",
+      method: "POST"
     });
     const response = await testApp.handle(request);
     const body = await response.json();
@@ -103,10 +103,10 @@ describe("POST /api/v1/orders", () => {
             stars: 5,
             ratingCount: 10,
             priceCents: 500,
-            keywords: ["electronics"],
-          },
-        },
-      ],
+            keywords: ["electronics"]
+          }
+        }
+      ]
     });
   });
 
@@ -114,7 +114,7 @@ describe("POST /api/v1/orders", () => {
     (prisma.cartItem.findMany as any).mockResolvedValue([]);
 
     const request = new Request("http://localhost:3004/api/v1/orders", {
-      method: "POST",
+      method: "POST"
     });
     const response = await testApp.handle(request);
     const body = await response.text();
@@ -130,14 +130,14 @@ describe("POST /api/v1/orders", () => {
         quantity: 1,
         estimatedDeliveryTimeMs: BigInt(86400000),
         product: null,
-        deliveryOptionId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-      },
+        deliveryOptionId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+      }
     ]);
 
     (createOrder as any).mockRejectedValue(new Error("DB create error"));
 
     const request = new Request("http://localhost:3004/api/v1/orders", {
-      method: "POST",
+      method: "POST"
     });
     const response = await testApp.handle(request);
     const body = await response.text();

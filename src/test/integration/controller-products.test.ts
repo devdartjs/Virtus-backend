@@ -25,7 +25,7 @@ describe("GET /api/v1/products - Integration Tests with real container data", ()
     const response = await app.handle(
       new Request("http://localhost:3004/api/v1/products", {
         method: "GET",
-        headers: { "x-forwarded-for": "127.0.0.1" },
+        headers: { "x-forwarded-for": "127.0.0.1" }
       })
     );
 
@@ -55,7 +55,7 @@ describe("GET /api/v1/products - Integration Tests with real container data", ()
       await app.handle(
         new Request("http://localhost:3004/api/v1/products", {
           method: "GET",
-          headers: { "x-forwarded-for": ip },
+          headers: { "x-forwarded-for": ip }
         })
       );
       await new Promise((r) => setTimeout(r, 10));
@@ -64,7 +64,7 @@ describe("GET /api/v1/products - Integration Tests with real container data", ()
     const response = await app.handle(
       new Request("http://localhost:3004/api/v1/products", {
         method: "GET",
-        headers: { "x-forwarded-for": ip },
+        headers: { "x-forwarded-for": ip }
       })
     );
 
@@ -82,7 +82,7 @@ describe("GET /api/v1/products/:id - Integration Tests", () => {
     const listResponse = await app.handle(
       new Request("http://localhost:3004/api/v1/products", {
         method: "GET",
-        headers: { "x-forwarded-for": "127.0.0.1" },
+        headers: { "x-forwarded-for": "127.0.0.1" }
       })
     );
     const listBody = await listResponse.json();
@@ -91,7 +91,7 @@ describe("GET /api/v1/products/:id - Integration Tests", () => {
     const response = await app.handle(
       new Request(`http://localhost:3004/api/v1/products/${validId}`, {
         method: "GET",
-        headers: { "x-forwarded-for": "127.0.0.1" },
+        headers: { "x-forwarded-for": "127.0.0.1" }
       })
     );
 
@@ -113,7 +113,7 @@ describe("GET /api/v1/products/:id - Integration Tests", () => {
     const response = await app.handle(
       new Request("http://localhost:3004/api/v1/products/non-existing-id-123", {
         method: "GET",
-        headers: { "x-forwarded-for": "127.0.0.2" },
+        headers: { "x-forwarded-for": "127.0.0.2" }
       })
     );
 
@@ -130,7 +130,7 @@ describe("GET /api/v1/products/:id - Integration Tests", () => {
     const listResponse = await app.handle(
       new Request("http://localhost:3004/api/v1/products", {
         method: "GET",
-        headers: { "x-forwarded-for": ip },
+        headers: { "x-forwarded-for": ip }
       })
     );
     const listBody = await listResponse.json();
@@ -142,7 +142,7 @@ describe("GET /api/v1/products/:id - Integration Tests", () => {
       await app.handle(
         new Request(`http://localhost:3004/api/v1/products/${validId}`, {
           method: "GET",
-          headers: { "x-forwarded-for": ip },
+          headers: { "x-forwarded-for": ip }
         })
       );
       await new Promise((r) => setTimeout(r, 10));
@@ -151,7 +151,7 @@ describe("GET /api/v1/products/:id - Integration Tests", () => {
     const response = await app.handle(
       new Request(`http://localhost:3004/api/v1/products/${validId}`, {
         method: "GET",
-        headers: { "x-forwarded-for": ip },
+        headers: { "x-forwarded-for": ip }
       })
     );
 

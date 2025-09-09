@@ -4,14 +4,13 @@ import { DeliveryOptionsService } from "./service-do";
 import { DeliveryOptionsSchemaT } from "./schema-do";
 
 export const deliveryOptionsRoute = new Elysia({
-  prefix: "/api/v1/delivery-options",
+  prefix: "/api/v1/delivery-options"
 }).get(
   "/",
   async ({ set, query }) => {
     return record("db.listDeliveryOptions", async () => {
       try {
-        const deliveryOptions =
-          await DeliveryOptionsService.getDeliveryOptions();
+        const deliveryOptions = await DeliveryOptionsService.getDeliveryOptions();
         if (deliveryOptions.length === 0) {
           set.status = 400;
           throw new Error("No Delivery Options Available");
@@ -21,8 +20,7 @@ export const deliveryOptionsRoute = new Elysia({
           const now = Date.now();
           return deliveryOptions.map((option: any) => ({
             ...option,
-            estimatedDeliveryTimeMs:
-              now + (option.deliveryDays ?? 0) * 24 * 60 * 60 * 1000,
+            estimatedDeliveryTimeMs: now + (option.deliveryDays ?? 0) * 24 * 60 * 60 * 1000
           }));
         }
 
@@ -35,15 +33,15 @@ export const deliveryOptionsRoute = new Elysia({
   },
   {
     query: t.Object({
-      expand: t.Optional(t.String()),
+      expand: t.Optional(t.String())
     }),
     response: t.Array(
       t.Intersect([
         DeliveryOptionsSchemaT,
         t.Object({
-          estimatedDeliveryTimeMs: t.Optional(t.Number()),
-        }),
+          estimatedDeliveryTimeMs: t.Optional(t.Number())
+        })
       ])
-    ),
+    )
   }
 );

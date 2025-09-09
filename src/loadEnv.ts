@@ -14,9 +14,7 @@ const envFile = `.env.${envName}`;
 const fallbackFile = ".env";
 
 // 3️⃣ Seleciona qual arquivo carregar
-const pathToLoad = existsSync(join(process.cwd(), envFile))
-  ? envFile
-  : fallbackFile;
+const pathToLoad = existsSync(join(process.cwd(), envFile)) ? envFile : fallbackFile;
 
 // 4️⃣ Carrega dotenv
 dotenv.config({ path: pathToLoad, override: true });

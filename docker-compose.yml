@@ -176,6 +176,8 @@ services:
       - app-network
     profiles:
       - test
+    env_file:
+      - .env
     deploy:
       resources:
         limits:
@@ -188,7 +190,6 @@ volumes:
 networks:
   app-network:
     driver: bridge
-#docker-compose --profile dev up --build -d
-#docker-compose --profile stage up --build -d   ---------->
+# <name> = dev, stage or test
+#docker-compose --profile <name> up --build -d
 
-# curl -i http://localhost    (verify access to nginx server)
