@@ -54,7 +54,7 @@ jobs:
         run: bunx prisma generate
 
       # 9️⃣ Run unit tests
-      - name: Run unit tests with coverage
+      - name: Run unit tests
         run: bun run test:unit
 
   integration-tests:
@@ -81,9 +81,30 @@ jobs:
           PORT: 3000
         run: docker compose --profile test up --build -d
 
+      - name: Wait for PostgreSQL
+        run: |
+          ATTEMPTS=0
+          MAX_ATTEMPTS=15
+          until docker compose exec -T db pg_isready -U dart > /dev/null 2>&1; do
+            echo "Waiting for database..."
+            sleep 2
+            ATTEMPTS=$((ATTEMPTS+1))
+            if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then
+              echo "Database did not become ready in time."
+              exit 1
+            fi
+          done
+
+      - name: Apply migrations, generate Prisma client & seed
+        run: |
+          docker compose exec -T app4 bunx prisma migrate deploy
+          docker compose exec -T app4 bunx prisma generate
+          docker compose exec -T app4 bunx prisma db seed
+
       # 4️⃣ Run tests in containers
       - name: Run unit tests
         run: docker compose exec -T app4 bun run test:unit
+
       - name: Run integration tests
         run: docker compose exec -T app4 bun run test:integration
 

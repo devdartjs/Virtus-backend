@@ -169,9 +169,14 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL}
       PORT: ${PORT}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - app-network
     profiles:
