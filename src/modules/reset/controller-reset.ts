@@ -15,17 +15,17 @@ export const resetRoute = new Elysia({ prefix: "/api/v1/reset" }).post("/", asyn
         prisma.product.deleteMany()
       ]);
 
-      await seed().catch(() => {
-        console.error("❌ Failed to seed:");
-        process.exit(1);
+      await seed().catch((error) => {
+        console.error("❌ Failed to seed:", error);
+        throw error;
       });
 
       set.status = 200;
       return { message: "Database reset and seeded successfully" };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Reset DB error:", error);
       set.status = 500;
-      throw new Error("Failed to reset and seed database");
+      return { error: "Failed to reset and seed database", details: error.message };
     }
   })
 );

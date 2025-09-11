@@ -13,7 +13,7 @@ describe("Reset Route Integration", () => {
     await prisma.$disconnect();
   });
 
-  test("POST /api/v1/reset should reset and seed the database", async () => {
+  test("POST /api/v1/reset/ should reset and seed the database", async () => {
     const response = await app.handle(
       new Request("http://localhost:3004/api/v1/reset/", { method: "POST" })
     );
