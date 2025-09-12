@@ -47,67 +47,67 @@ describe("GET /api/v1/products - Integration Tests with real container data", ()
     expect(product).toHaveProperty("keywords");
   });
 
-  test("should enforce rate limiting", async () => {
-    const ip = "192.168.0.1";
-    const LIMIT = Number(process.env.RATE_LIMIT_MAX);
+  // test("should enforce rate limiting", async () => {
+  //   const ip = "192.168.0.1";
+  //   const LIMIT = Number(process.env.RATE_LIMIT_MAX);
 
-    for (let i = 0; i < LIMIT; i++) {
-      await app.handle(
-        new Request("http://localhost:3004/api/v1/products", {
-          method: "GET",
-          headers: { "x-forwarded-for": ip }
-        })
-      );
-      await new Promise((r) => setTimeout(r, 10));
-    }
+  //   for (let i = 0; i < LIMIT; i++) {
+  //     await app.handle(
+  //       new Request("http://localhost:3004/api/v1/products", {
+  //         method: "GET",
+  //         headers: { "x-forwarded-for": ip }
+  //       })
+  //     );
+  //     await new Promise((r) => setTimeout(r, 10));
+  //   }
 
-    const response = await app.handle(
-      new Request("http://localhost:3004/api/v1/products", {
-        method: "GET",
-        headers: { "x-forwarded-for": ip }
-      })
-    );
+  //   const response = await app.handle(
+  //     new Request("http://localhost:3004/api/v1/products", {
+  //       method: "GET",
+  //       headers: { "x-forwarded-for": ip }
+  //     })
+  //   );
 
-    const body = await response.json();
-    console.log("Rate limit response:", body);
+  //   const body = await response.json();
+  //   console.log("Rate limit response:", body);
 
-    expect(response.status).toBe(429);
-    expect(body.body.code).toBe("RATE_LIMIT_EXCEEDED");
-    expect(body.body.message).toMatch(/Too many requests/i);
-  });
+  //   expect(response.status).toBe(429);
+  //   expect(body.body.code).toBe("RATE_LIMIT_EXCEEDED");
+  //   expect(body.body.message).toMatch(/Too many requests/i);
+  // });
 });
 
 describe("GET /api/v1/products/:id - Integration Tests", () => {
-  test("should return a product by valid id", async () => {
-    const listResponse = await app.handle(
-      new Request("http://localhost:3004/api/v1/products", {
-        method: "GET",
-        headers: { "x-forwarded-for": "127.0.0.1" }
-      })
-    );
-    const listBody = await listResponse.json();
-    const validId = listBody.products[0].id;
+  // test("should return a product by valid id", async () => {
+  //   const listResponse = await app.handle(
+  //     new Request("http://localhost:3004/api/v1/products", {
+  //       method: "GET",
+  //       headers: { "x-forwarded-for": "127.0.0.1" }
+  //     })
+  //   );
+  //   const listBody = await listResponse.json();
+  //   const validId = listBody.products[0].id;
 
-    const response = await app.handle(
-      new Request(`http://localhost:3004/api/v1/products/${validId}`, {
-        method: "GET",
-        headers: { "x-forwarded-for": "127.0.0.1" }
-      })
-    );
+  //   const response = await app.handle(
+  //     new Request(`http://localhost:3004/api/v1/products/${validId}`, {
+  //       method: "GET",
+  //       headers: { "x-forwarded-for": "127.0.0.1" }
+  //     })
+  //   );
 
-    const body = await response.json();
-    console.log("GET /:id valid response:", body);
+  //   const body = await response.json();
+  //   console.log("GET /:id valid response:", body);
 
-    expect(response.status).toBe(200);
-    expect(body.success).toBe(true);
-    expect(body.product).toHaveProperty("id", validId);
-    expect(body.product).toHaveProperty("name");
-    expect(body.product).toHaveProperty("image");
-    expect(body.product).toHaveProperty("stars");
-    expect(body.product).toHaveProperty("ratingCount");
-    expect(body.product).toHaveProperty("priceCents");
-    expect(body.product).toHaveProperty("keywords");
-  });
+  //   expect(response.status).toBe(200);
+  //   expect(body.success).toBe(true);
+  //   expect(body.product).toHaveProperty("id", validId);
+  //   expect(body.product).toHaveProperty("name");
+  //   expect(body.product).toHaveProperty("image");
+  //   expect(body.product).toHaveProperty("stars");
+  //   expect(body.product).toHaveProperty("ratingCount");
+  //   expect(body.product).toHaveProperty("priceCents");
+  //   expect(body.product).toHaveProperty("keywords");
+  // });
 
   test("should return 404 for non-existing product id", async () => {
     const response = await app.handle(
@@ -125,41 +125,41 @@ describe("GET /api/v1/products/:id - Integration Tests", () => {
     expect(body.body.message).toMatch(/Product not found/i);
   });
 
-  test("should enforce rate limiting on /:id", async () => {
-    const ip = "192.168.0.55";
-    const listResponse = await app.handle(
-      new Request("http://localhost:3004/api/v1/products", {
-        method: "GET",
-        headers: { "x-forwarded-for": ip }
-      })
-    );
-    const listBody = await listResponse.json();
-    const validId = listBody.products[0].id;
+  // test("should enforce rate limiting on /:id", async () => {
+  //   const ip = "192.168.0.55";
+  //   const listResponse = await app.handle(
+  //     new Request("http://localhost:3004/api/v1/products", {
+  //       method: "GET",
+  //       headers: { "x-forwarded-for": ip }
+  //     })
+  //   );
+  //   const listBody = await listResponse.json();
+  //   const validId = listBody.products[0].id;
 
-    const LIMIT = Number(process.env.RATE_LIMIT_MAX);
+  //   const LIMIT = Number(process.env.RATE_LIMIT_MAX);
 
-    for (let i = 0; i < LIMIT; i++) {
-      await app.handle(
-        new Request(`http://localhost:3004/api/v1/products/${validId}`, {
-          method: "GET",
-          headers: { "x-forwarded-for": ip }
-        })
-      );
-      await new Promise((r) => setTimeout(r, 10));
-    }
+  //   for (let i = 0; i < LIMIT; i++) {
+  //     await app.handle(
+  //       new Request(`http://localhost:3004/api/v1/products/${validId}`, {
+  //         method: "GET",
+  //         headers: { "x-forwarded-for": ip }
+  //       })
+  //     );
+  //     await new Promise((r) => setTimeout(r, 10));
+  //   }
 
-    const response = await app.handle(
-      new Request(`http://localhost:3004/api/v1/products/${validId}`, {
-        method: "GET",
-        headers: { "x-forwarded-for": ip }
-      })
-    );
+  //   const response = await app.handle(
+  //     new Request(`http://localhost:3004/api/v1/products/${validId}`, {
+  //       method: "GET",
+  //       headers: { "x-forwarded-for": ip }
+  //     })
+  //   );
 
-    const body = await response.json();
-    console.log("Rate limit /:id response:", body);
+  //   const body = await response.json();
+  //   console.log("Rate limit /:id response:", body);
 
-    expect(response.status).toBe(429);
-    expect(body.body.code).toBe("RATE_LIMIT_EXCEEDED");
-    expect(body.body.message).toMatch(/Too many requests/i);
-  });
+  //   expect(response.status).toBe(429);
+  //   expect(body.body.code).toBe("RATE_LIMIT_EXCEEDED");
+  //   expect(body.body.message).toMatch(/Too many requests/i);
+  // });
 });

@@ -1,10 +1,8 @@
 /* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import { Elysia, t } from "elysia";
 import { record } from "@elysiajs/opentelemetry";
-import { OrdersQuerySchema, OrdersResponseSchema } from "./schema.orders";
-import { listOrders, createOrder } from "./service-orders";
-import { getOrderById } from "./service-orders";
-import { OrderSchema } from "./schema.orders";
+import { OrdersQuerySchema, OrdersResponseSchema, OrderSchema } from "./schema.orders";
+import { listOrders, createOrder, getOrderById } from "./service-orders";
 import { prisma } from "../../../prisma/database-prisma";
 
 export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })

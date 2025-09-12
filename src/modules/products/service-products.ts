@@ -1,10 +1,9 @@
 /* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import { prisma } from "../../../prisma/database-prisma";
-import { Product } from "./model-products";
 import { getOrSetCache } from "../../lib/redis/cache";
 
 export class ProductService {
-  static async getAllProducts(): Promise<Product[]> {
+  static async getAllProducts() {
     return getOrSetCache(
       "products:all",
       async () => {

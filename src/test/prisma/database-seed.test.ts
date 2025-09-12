@@ -87,7 +87,9 @@ describe("seed function", () => {
   test("should handle empty products gracefully", async () => {
     (prisma.product.findMany as any).mockResolvedValue([]);
 
-    await expect(seed()).resolves.not.toThrow();
+    const result = await seed();
+
+    expect(result).toEqual({ message: "Products or delivery options missing" });
     expect(prisma.$disconnect).toHaveBeenCalled();
   });
 
@@ -95,7 +97,9 @@ describe("seed function", () => {
     (prisma.product.findMany as any).mockResolvedValue(productsSeed);
     (prisma.deliveryOption.findMany as any).mockResolvedValue([]);
 
-    await expect(seed()).resolves.not.toThrow();
+    const result = await seed();
+
+    expect(result).toEqual({ message: "Products or delivery options missing" });
     expect(prisma.$disconnect).toHaveBeenCalled();
   });
 });

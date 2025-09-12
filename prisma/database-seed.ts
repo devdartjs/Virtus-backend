@@ -5,21 +5,21 @@ import seedDeliveryOptions from "../src/lib/seed-functions/seedDeliveryOptions";
 
 export async function seed() {
   try {
-    console.log("import.meta.main =", import.meta.main);
     console.log("Seeding database:", process.env.DATABASE_URL);
 
     await seedProducts();
-    const products = (await prisma.product.findMany()) || [];
-    if (products.length === 0) {
-      console.warn("No products available for seeding cart items and orders");
-      return { success: false, reason: "no-products" };
-    }
-
     await seedDeliveryOptions();
-    const deliveryOptions = (await prisma.deliveryOption.findMany()) || [];
-    if (deliveryOptions.length === 0) {
-      console.warn("No delivery options available for seeding cart items");
-      return { success: false, reason: "no-delivery-options" };
+
+    const products = await prisma.product.findMany();
+    const deliveryOptions = await prisma.deliveryOption.findMany();
+
+    if (
+      products === undefined ||
+      products.length === 0 ||
+      deliveryOptions === undefined ||
+      deliveryOptions.length === 0
+    ) {
+      return { message: "Products or delivery options missing" };
     }
 
     const countCartItems = await prisma.cartItem.count();
@@ -106,14 +106,8 @@ export async function seed() {
   }
 }
 
-if (import.meta.main) {
-  seed().catch((e) => {
+seed().catch((e) => {
     console.error("Failed to seed database:", e);
     throw e;
   });
-} else {
-  seed().catch((e) => {
-    console.error("Failed to seed database:", e);
-    throw e;
-  });
-}
+
