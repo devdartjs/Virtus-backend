@@ -1,1 +1,1 @@
-& (2tsX]hrsrc/test/redis/cache.test.ts
+& (2tsXyhr!src/test/redis/rate-limit.test.ts

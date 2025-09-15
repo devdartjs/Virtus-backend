@@ -5,6 +5,12 @@ import { ProductSchemaT } from "../products/schema-products";
 import { ProductError } from "./Error/ProductErrorClass";
 import { rateLimiter } from "../../lib/redis/rate-limit";
 
+type ResponseValidationError = {
+  on: "response";
+  summary?: string;
+  errors?: unknown[];
+};
+
 export const productsRoute = new Elysia({ prefix: "/api/v1/products" })
   .error({
     PRODUCT_ERROR: ProductError
@@ -15,9 +21,10 @@ export const productsRoute = new Elysia({ prefix: "/api/v1/products" })
     }
 
     if (error instanceof Error && (error as any).status === 429) {
+      const rateError = error as Error & { status: number };
       return {
         status: 429,
-        body: { message: error.message, code: "RATE_LIMIT_EXCEEDED" }
+        body: { message: rateError.message, code: "RATE_LIMIT_EXCEEDED" }
       };
     }
 
@@ -26,15 +33,16 @@ export const productsRoute = new Elysia({ prefix: "/api/v1/products" })
       typeof error === "object" &&
       error !== null &&
       "on" in error &&
-      (error as any).on === "response"
+      (error as ResponseValidationError).on === "response"
     ) {
+      const respError = error as ResponseValidationError;
       return {
         status: 422,
         body: {
           message: "Error validating API response",
           code: "RESPONSE_VALIDATION_ERROR",
-          summary: (error as any).summary ?? "Unknown error",
-          details: (error as any).errors ?? []
+          summary: respError.summary ?? "Unknown error",
+          details: respError.errors ?? []
         }
       };
     }

@@ -156,6 +156,7 @@ services:
     profiles:
       - stage
       - test
+      - sonar
     deploy:
       resources:
         limits:

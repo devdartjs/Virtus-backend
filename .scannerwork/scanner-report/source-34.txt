@@ -1,271 +1,336 @@
-import { describe, test, expect, afterEach, vi } from "vitest";
-import { CartItemsService } from "../../../modules/cart-items/service-cart-item";
+import { describe, test, expect, vi, beforeEach } from "vitest";
+import { listOrders, createOrder, getOrderById } from "../../../modules/orders/service-orders";
+
+vi.mock("../../../../prisma/database-prisma", () => ({
+  prisma: {
+    order: {
+      findMany: vi.fn(),
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      delete: vi.fn()
+    },
+    orderItem: {
+      deleteMany: vi.fn()
+    },
+    product: {
+      findMany: vi.fn()
+    },
+    deliveryOption: {
+      findMany: vi.fn()
+    },
+    cartItem: {
+      findMany: vi.fn()
+    }
+  }
+}));
+
 import { prisma } from "../../../../prisma/database-prisma";
 
-vi.mock("../../../../prisma/database-prisma", () => {
-  return {
-    prisma: {
-      cartItem: {
-        findMany: vi.fn(),
-        findFirst: vi.fn(),
-        create: vi.fn(),
-        delete: vi.fn(),
-        update: vi.fn()
-      }
-    }
-  };
-});
-
-describe("CartItemsService - getCartItems", () => {
-  afterEach(() => {
+describe("service-orders", () => {
+  beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  test("should return a list of cart items ordered by product name", async () => {
-    const mockItems = [
-      { id: "1", productId: "a", quantity: 2, deliveryOptionId: "x" },
-      { id: "2", productId: "b", quantity: 1, deliveryOptionId: "y" }
-    ];
+  describe("listOrders", () => {
+    test("returns orders with expanded products when expandProduct is true", async () => {
+      (prisma.order.findMany as any).mockResolvedValue([
+        {
+          id: "order-1",
+          orderTimeMs: BigInt(123456789),
+          totalCostCents: 1000,
+          items: [
+            {
+              productId: "prod-1",
+              quantity: 2,
+              estimatedDeliveryTimeMs: BigInt(86400000),
+              product: {
+                id: "prod-1",
+                name: "Product 1",
+                image: "image.png",
+                stars: 4.5,
+                ratingCount: 100,
+                priceCents: 500,
+                keywords: ["tag1", "tag2"]
+              }
+            }
+          ]
+        }
+      ]);
 
-    (prisma.cartItem.findMany as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(mockItems);
-
-    const result = await CartItemsService.getCartItems();
-
-    expect(prisma.cartItem.findMany).toHaveBeenCalledWith({
-      orderBy: { product: { name: "asc" } }
-    });
-    expect(result).toEqual(mockItems);
-  });
-
-  test("should return an empty array if no cart items exist", async () => {
-    (prisma.cartItem.findMany as unknown as ReturnType<typeof vi.fn>).mockResolvedValue([]);
-
-    const result = await CartItemsService.getCartItems();
-
-    expect(result).toEqual([]);
-  });
-
-  test("should propagate errors thrown by Prisma", async () => {
-    const error = new Error("Database error");
-    (prisma.cartItem.findMany as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(error);
-
-    await expect(CartItemsService.getCartItems()).rejects.toThrow("Database error");
-  });
-});
-
-describe("CartItemsService - createCartItem", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  test("should create a cart item successfully", async () => {
-    const mockData = {
-      productId: "prod-1",
-      quantity: 2,
-      deliveryOptionId: "del-1"
-    };
-
-    const mockCreatedItem = {
-      id: "cart-1",
-      ...mockData
-    };
-
-    (prisma.cartItem.create as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockCreatedItem
-    );
-
-    const result = await CartItemsService.createCartItem(mockData);
-
-    expect(prisma.cartItem.create).toHaveBeenCalledWith({
-      data: {
-        product: { connect: { id: mockData.productId } },
-        deliveryOption: { connect: { id: mockData.deliveryOptionId } },
-        quantity: mockData.quantity
-      },
-      select: {
-        id: true,
-        productId: true,
-        quantity: true,
-        deliveryOptionId: true
-      }
+      const result = await listOrders(true);
+      expect(result).toHaveLength(1);
+      expect(result[0].products[0].productId).toBeDefined();
+      expect(result[0].products[0].productId).toBeDefined();
     });
 
-    expect(result).toEqual(mockCreatedItem);
-  });
+    test("returns orders without expanded products when expandProduct is false", async () => {
+      (prisma.order.findMany as any).mockResolvedValue([
+        {
+          id: "order-1",
+          orderTimeMs: BigInt(123456789),
+          totalCostCents: 1000,
+          items: [
+            {
+              productId: "prod-1",
+              quantity: 2,
+              estimatedDeliveryTimeMs: BigInt(86400000),
+              product: null
+            }
+          ]
+        }
+      ]);
 
-  test("should propagate errors thrown by Prisma", async () => {
-    const mockData = {
-      productId: "prod-1",
-      quantity: 2,
-      deliveryOptionId: "del-1"
-    };
-
-    const error = new Error("Database create error");
-    (prisma.cartItem.create as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(error);
-
-    await expect(CartItemsService.createCartItem(mockData)).rejects.toThrow(
-      "Database create error"
-    );
-  });
-});
-
-describe("CartItemsService - deleteCartItem", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  test("should delete a cart item successfully", async () => {
-    const mockId = "550e8400-e29b-41d4-a716-446655440000";
-    const mockDeletedItem = {
-      id: mockId,
-      productId: "550e8400-e29b-41d4-a716-446655440001",
-      quantity: 3,
-      deliveryOptionId: "del-1"
-    };
-
-    (prisma.cartItem.delete as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockDeletedItem
-    );
-
-    const deletedItem = await CartItemsService.deleteCartItem(mockId);
-
-    expect(prisma.cartItem.delete).toHaveBeenCalledWith({
-      where: { id: mockId }
+      const result = await listOrders(false);
+      expect(result[0].products[0]).not.toHaveProperty("product");
+      expect(result[0].products[0].quantity).toBe(2);
     });
 
-    expect(deletedItem).toEqual(mockDeletedItem);
-  });
+    test("returns empty array when no orders exist", async () => {
+      (prisma.order.findMany as any).mockResolvedValue([]);
 
-  test("should propagate errors thrown by Prisma", async () => {
-    const mockId = "cart-1";
-    const error = new Error("Database delete error");
-
-    (prisma.cartItem.delete as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(error);
-
-    await expect(CartItemsService.deleteCartItem(mockId)).rejects.toThrow("Database delete error");
-  });
-});
-
-describe("CartItemsService - updateCartItem", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  test("should update a cart item successfully with quantity only", async () => {
-    const mockId = "cart-1";
-    const mockData = { quantity: 5 };
-    const mockUpdatedItem = {
-      id: mockId,
-      productId: "prod-1",
-      quantity: 5,
-      deliveryOptionId: "del-1"
-    };
-
-    (prisma.cartItem.update as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockUpdatedItem
-    );
-
-    const result = await CartItemsService.updateCartItem(mockId, mockData);
-
-    expect(prisma.cartItem.update).toHaveBeenCalledWith({
-      where: { id: mockId },
-      data: { quantity: mockData.quantity },
-      select: {
-        id: true,
-        productId: true,
-        quantity: true,
-        deliveryOptionId: true
-      }
+      const result = await listOrders(true);
+      expect(result).toEqual([]);
     });
 
-    expect(result).toEqual(mockUpdatedItem);
-  });
+    test("handles multiple items in a single order", async () => {
+      (prisma.order.findMany as any).mockResolvedValue([
+        {
+          id: "order-2",
+          orderTimeMs: BigInt(987654321),
+          totalCostCents: 2500,
+          items: [
+            {
+              productId: "prod-1",
+              quantity: 1,
+              estimatedDeliveryTimeMs: BigInt(86400000),
+              product: { id: "prod-1", name: "Product 1" }
+            },
+            {
+              productId: "prod-2",
+              quantity: 3,
+              estimatedDeliveryTimeMs: BigInt(172800000),
+              product: { id: "prod-2", name: "Product 2" }
+            }
+          ]
+        }
+      ]);
 
-  test("should update a cart item successfully with deliveryOptionId only", async () => {
-    const mockId = "cart-1";
-    const mockData = { deliveryOptionId: "del-2" };
-    const mockUpdatedItem = {
-      id: mockId,
-      productId: "prod-1",
-      quantity: 2,
-      deliveryOptionId: "del-2"
-    };
-
-    (prisma.cartItem.update as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockUpdatedItem
-    );
-
-    const result = await CartItemsService.updateCartItem(mockId, mockData);
-
-    expect(prisma.cartItem.update).toHaveBeenCalledWith({
-      where: { id: mockId },
-      data: { deliveryOption: { connect: { id: mockData.deliveryOptionId } } },
-      select: {
-        id: true,
-        productId: true,
-        quantity: true,
-        deliveryOptionId: true
-      }
+      const result = await listOrders(true);
+      expect(result[0].products).toHaveLength(2);
+      expect(result[0].products[1].quantity).toBe(3);
     });
 
-    expect(result).toEqual(mockUpdatedItem);
-  });
+    test("converts BigInt fields into numbers", async () => {
+      (prisma.order.findMany as any).mockResolvedValue([
+        {
+          id: "order-3",
+          orderTimeMs: BigInt(555),
+          totalCostCents: 1234,
+          items: [
+            {
+              productId: "prod-3",
+              quantity: 5,
+              estimatedDeliveryTimeMs: BigInt(333),
+              product: null
+            }
+          ]
+        }
+      ]);
 
-  test("should propagate errors thrown by Prisma", async () => {
-    const mockId = "cart-1";
-    const mockData = { quantity: 3 };
-    const error = new Error("Database update error");
-
-    (prisma.cartItem.update as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(error);
-
-    await expect(CartItemsService.updateCartItem(mockId, mockData)).rejects.toThrow(
-      "Database update error"
-    );
-  });
-});
-
-describe("CartItemsService - findByProductId", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  test("should return a cart item if it exists", async () => {
-    const mockProductId = "prod-1";
-    const mockCartItem = {
-      id: "cart-1",
-      productId: mockProductId,
-      quantity: 2,
-      deliveryOptionId: "del-1"
-    };
-
-    (prisma.cartItem.findFirst as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockCartItem
-    );
-
-    const result = await CartItemsService.findByProductId(mockProductId);
-
-    expect(prisma.cartItem.findFirst).toHaveBeenCalledWith({
-      where: { productId: mockProductId }
+      const result = await listOrders(false);
+      expect(typeof result[0].orderTimeMs).toBe("number");
+      expect(typeof result[0].products[0].estimatedDeliveryTimeMs).toBe("number");
     });
-    expect(result).toEqual(mockCartItem);
   });
 
-  test("should return null if no cart item exists with the given productId", async () => {
-    const mockProductId = "prod-1";
+  describe("createOrder", () => {
+    test("throws error when cart is empty", async () => {
+      await expect(createOrder([])).rejects.toThrow("Cart cannot be empty");
+    });
 
-    (prisma.cartItem.findFirst as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+    test("throws error when product is missing", async () => {
+      (prisma.product.findMany as any).mockResolvedValue([]);
+      (prisma.deliveryOption.findMany as any).mockResolvedValue([
+        { id: "del-1", deliveryDays: 2, priceCents: 100 }
+      ]);
 
-    const result = await CartItemsService.findByProductId(mockProductId);
+      const cart = [{ productId: "prod-1", quantity: 1, deliveryOptionId: "del-1" }];
+      await expect(createOrder(cart)).rejects.toThrow("One or more products not found");
+    });
 
-    expect(result).toBeNull();
+    test("throws error when delivery option is missing", async () => {
+      (prisma.product.findMany as any).mockResolvedValue([{ id: "prod-1", priceCents: 500 }]);
+      (prisma.deliveryOption.findMany as any).mockResolvedValue([]);
+
+      const cart = [{ productId: "prod-1", quantity: 1, deliveryOptionId: "del-1" }];
+      await expect(createOrder(cart)).rejects.toThrow("One or more delivery options not found");
+    });
+
+    test("creates an order with valid cart", async () => {
+      (prisma.product.findMany as any).mockResolvedValue([{ id: "prod-1", priceCents: 500 }]);
+      (prisma.deliveryOption.findMany as any).mockResolvedValue([
+        { id: "del-1", deliveryDays: 2, priceCents: 100 }
+      ]);
+      (prisma.order.create as any).mockResolvedValue({
+        id: "order-1",
+        orderTimeMs: BigInt(123456789),
+        totalCostCents: 1100,
+        items: [
+          {
+            productId: "prod-1",
+            quantity: 1,
+            estimatedDeliveryTimeMs: BigInt(172800000),
+            product: { id: "prod-1", name: "Product 1" }
+          }
+        ]
+      });
+
+      const cart = [{ productId: "prod-1", quantity: 1, deliveryOptionId: "del-1" }];
+      const order = await createOrder(cart);
+
+      expect(order.id).toBe("order-1");
+      expect(order.items[0].productId).toBe("prod-1");
+    });
+
+    test("creates order with multiple products", async () => {
+      (prisma.product.findMany as any).mockResolvedValue([
+        { id: "prod-1", priceCents: 500 },
+        { id: "prod-2", priceCents: 300 }
+      ]);
+      (prisma.deliveryOption.findMany as any).mockResolvedValue([
+        { id: "del-1", deliveryDays: 2, priceCents: 100 },
+        { id: "del-2", deliveryDays: 3, priceCents: 200 }
+      ]);
+      (prisma.order.create as any).mockResolvedValue({
+        id: "order-2",
+        orderTimeMs: BigInt(987654321),
+        totalCostCents: 1400, // 500 + 300 + 100 + 500
+        items: [
+          {
+            productId: "prod-1",
+            quantity: 1,
+            estimatedDeliveryTimeMs: BigInt(172800000),
+            product: { id: "prod-1", name: "Product 1" }
+          },
+          {
+            productId: "prod-2",
+            quantity: 2,
+            estimatedDeliveryTimeMs: BigInt(259200000),
+            product: { id: "prod-2", name: "Product 2" }
+          }
+        ]
+      });
+
+      const cart = [
+        { productId: "prod-1", quantity: 1, deliveryOptionId: "del-1" },
+        { productId: "prod-2", quantity: 2, deliveryOptionId: "del-2" }
+      ];
+
+      const order = await createOrder(cart);
+
+      expect(order.id).toBe("order-2");
+      expect(order.totalCostCents).toBe(1400);
+      expect(order.items).toHaveLength(2);
+    });
   });
 
-  test("should propagate errors thrown by Prisma", async () => {
-    const mockProductId = "prod-1";
-    const error = new Error("Database error");
+  describe("getOrderById", () => {
+    test("returns null if order does not exist", async () => {
+      (prisma.order.findUnique as any).mockResolvedValue(null);
+      const result = await getOrderById("nonexistent-id", true);
+      expect(result).toBeNull();
+    });
 
-    (prisma.cartItem.findFirst as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(error);
+    test("returns order with expanded products", async () => {
+      (prisma.order.findUnique as any).mockResolvedValue({
+        id: "order-1",
+        orderTimeMs: BigInt(123456789),
+        totalCostCents: 1000,
+        items: [
+          {
+            productId: "prod-1",
+            quantity: 2,
+            estimatedDeliveryTimeMs: BigInt(86400000),
+            product: {
+              id: "prod-1",
+              name: "Product 1",
+              image: "image.png",
+              stars: 4.5,
+              ratingCount: 100,
+              priceCents: 500,
+              keywords: ["tag1", "tag2"]
+            }
+          }
+        ]
+      });
 
-    await expect(CartItemsService.findByProductId(mockProductId)).rejects.toThrow("Database error");
+      const result = await getOrderById("order-1", true);
+      expect(result?.products[0].productId).toBeDefined();
+    });
+
+    test("returns order without expanded products", async () => {
+      (prisma.order.findUnique as any).mockResolvedValue({
+        id: "order-1",
+        orderTimeMs: BigInt(123456789),
+        totalCostCents: 1000,
+        items: [
+          {
+            productId: "prod-1",
+            quantity: 2,
+            estimatedDeliveryTimeMs: BigInt(86400000),
+            product: null
+          }
+        ]
+      });
+
+      const result = await getOrderById("order-1", false);
+      expect(result?.products[0]).not.toHaveProperty("product");
+    });
+
+    test("handles orders with no items", async () => {
+      (prisma.order.findUnique as any).mockResolvedValue({
+        id: "order-2",
+        orderTimeMs: BigInt(987654321),
+        totalCostCents: 0,
+        items: []
+      });
+
+      const result = await getOrderById("order-2", true);
+      expect(result?.products).toEqual([]);
+    });
+
+    test("correctly maps bigint fields to numbers", async () => {
+      (prisma.order.findUnique as any).mockResolvedValue({
+        id: "order-3",
+        orderTimeMs: BigInt(1234),
+        totalCostCents: 2000,
+        items: [
+          {
+            productId: "prod-2",
+            quantity: 1,
+            estimatedDeliveryTimeMs: BigInt(5678),
+            product: {
+              id: "prod-2",
+              name: "Product 2",
+              image: "image2.png",
+              stars: 3.5,
+              ratingCount: 20,
+              priceCents: 2000,
+              keywords: ["tag3"]
+            }
+          }
+        ]
+      });
+
+      const result = await getOrderById("order-3", true);
+      expect(typeof result?.orderTimeMs).toBe("number");
+      expect(typeof result?.products[0].estimatedDeliveryTimeMs).toBe("number");
+    });
+
+    test("throws an error if prisma throws", async () => {
+      (prisma.order.findUnique as any).mockRejectedValue(new Error("DB error"));
+
+      await expect(getOrderById("order-error", true)).rejects.toThrow("DB error");
+    });
   });
 });

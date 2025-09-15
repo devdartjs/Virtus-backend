@@ -1,1 +1,1 @@
-% (2tsXjhr%src/test/prisma/database-seed.test.ts
+% (2tsX]hrsrc/test/redis/cache.test.ts

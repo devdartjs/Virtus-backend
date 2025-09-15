@@ -1,105 +1,92 @@
-import { describe, test, vi, beforeEach, expect } from "vitest";
-import { seed } from "../../../prisma/database-seed";
-import { prisma } from "../../../prisma/database-prisma";
+/* eslint no-console: ["error", { "allow": ["log", "error"] }] */
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { getOrSetCache } from "../../lib/redis/cache";
 
-import productsSeed from "../../lib/utils/productsSeed";
-import deliveryOptionsSeed from "../../lib/utils/deliveryOptionsSeed";
-
-vi.mock("../../../prisma/database-prisma", () => ({
-  prisma: {
-    product: {
-      count: vi.fn(),
-      createMany: vi.fn(),
-      findMany: vi.fn()
-    },
-    deliveryOption: {
-      count: vi.fn(),
-      createMany: vi.fn(),
-      findMany: vi.fn()
-    },
-    cartItem: {
-      count: vi.fn(),
-      createMany: vi.fn()
-    },
-    order: {
-      count: vi.fn(),
-      create: vi.fn()
-    },
-    $disconnect: vi.fn()
-  }
+const redisMock = vi.hoisted(() => ({
+  get: vi.fn(),
+  setex: vi.fn()
 }));
 
-describe("seed function", () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
+vi.mock("../../lib/redis/redis", () => ({
+  default: redisMock,
+  spy: true
+}));
 
-    (prisma.product.findMany as any).mockResolvedValue(productsSeed);
-    (prisma.deliveryOption.findMany as any).mockResolvedValue(deliveryOptionsSeed);
+beforeEach(() => {
+  vi.clearAllMocks();
+  process.env.CACHE_TTL = "60";
+});
 
-    (prisma.product.count as any).mockResolvedValue(0);
-    (prisma.deliveryOption.count as any).mockResolvedValue(0);
-    (prisma.cartItem.count as any).mockResolvedValue(0);
-    (prisma.order.count as any).mockResolvedValue(0);
+afterEach(() => {
+  process.env.CACHE_TTL = "60";
+});
 
-    (prisma.product.createMany as any).mockResolvedValue({});
-    (prisma.deliveryOption.createMany as any).mockResolvedValue({});
-    (prisma.cartItem.createMany as any).mockResolvedValue({});
-    (prisma.order.create as any).mockResolvedValue({});
+describe("getOrSetCache() function - Unit Tests", () => {
+  const key = "test:key";
+  const data = { product: "propylamine" };
+  const fetcher = vi.fn().mockResolvedValue(data);
+
+  test("returns cached value when cache hit", async () => {
+    redisMock.get.mockResolvedValueOnce(JSON.stringify(data));
+
+    const result = await getOrSetCache(key, fetcher);
+
+    expect(result).toEqual(data);
+    expect(redisMock.get).toHaveBeenCalledWith(key);
+    expect(fetcher).not.toHaveBeenCalled();
+    expect(redisMock.setex).not.toHaveBeenCalled();
   });
 
-  test("should seed products, delivery options, cart items and orders when none exist", async () => {
-    await seed();
+  test("fetches and caches value when cache miss", async () => {
+    redisMock.get.mockResolvedValueOnce(null);
 
-    expect(prisma.product.createMany).toHaveBeenCalled();
-    expect(prisma.deliveryOption.createMany).toHaveBeenCalled();
-    expect(prisma.cartItem.createMany).toHaveBeenCalled();
-    expect(prisma.order.create).toHaveBeenCalledTimes(2);
-    expect(prisma.$disconnect).toHaveBeenCalled();
+    const result = await getOrSetCache(key, fetcher, 120);
+
+    expect(result).toEqual(data);
+    expect(redisMock.get).toHaveBeenCalledWith(key);
+    expect(fetcher).toHaveBeenCalled();
+    expect(redisMock.setex).toHaveBeenCalledWith(key, 120, JSON.stringify(data));
   });
 
-  test("should skip product creation if products exist but seed others", async () => {
-    (prisma.product.count as any).mockResolvedValue(productsSeed.length);
+  test("uses default TTL from env when not specified", async () => {
+    redisMock.get.mockResolvedValueOnce(null);
 
-    await seed();
+    const result = await getOrSetCache(key, fetcher);
 
-    expect(prisma.product.createMany).not.toHaveBeenCalled();
-    expect(prisma.deliveryOption.createMany).toHaveBeenCalled();
-    expect(prisma.cartItem.createMany).toHaveBeenCalled();
-    expect(prisma.order.create).toHaveBeenCalledTimes(2);
-    expect(prisma.$disconnect).toHaveBeenCalled();
+    expect(result).toEqual(data);
+    expect(redisMock.setex).toHaveBeenCalledWith(key, 60, JSON.stringify(data));
   });
 
-  test("should skip all seeding when everything already exists", async () => {
-    (prisma.product.count as any).mockResolvedValue(productsSeed.length);
-    (prisma.deliveryOption.count as any).mockResolvedValue(deliveryOptionsSeed.length);
-    (prisma.cartItem.count as any).mockResolvedValue(1);
-    (prisma.order.count as any).mockResolvedValue(2);
+  test("propagates error if fetcher fails", async () => {
+    const fetcherError = new Error("DB failure");
+    const failingFetcher = vi.fn().mockRejectedValue(fetcherError);
+    redisMock.get.mockResolvedValueOnce(null);
 
-    await seed();
-
-    expect(prisma.product.createMany).not.toHaveBeenCalled();
-    expect(prisma.deliveryOption.createMany).not.toHaveBeenCalled();
-    expect(prisma.cartItem.createMany).not.toHaveBeenCalled();
-    expect(prisma.order.create).not.toHaveBeenCalled();
-    expect(prisma.$disconnect).toHaveBeenCalled();
+    await expect(getOrSetCache(key, failingFetcher)).rejects.toThrow("DB failure");
+    expect(redisMock.setex).not.toHaveBeenCalled();
   });
 
-  test("should handle empty products gracefully", async () => {
-    (prisma.product.findMany as any).mockResolvedValue([]);
+  test("logs cache hit and miss correctly", async () => {
+    redisMock.get.mockResolvedValueOnce(JSON.stringify(data));
+    const logSpy = vi.spyOn(console, "log");
 
-    const result = await seed();
+    await getOrSetCache(key, fetcher);
+    expect(logSpy).toHaveBeenCalledWith(`🟢 Cache hit: ${key}`);
 
-    expect(result).toEqual({ message: "Products or delivery options missing" });
-    expect(prisma.$disconnect).toHaveBeenCalled();
+    redisMock.get.mockResolvedValueOnce(null);
+    await getOrSetCache(key, fetcher, 30);
+    expect(logSpy).toHaveBeenCalledWith(`🟡 Cache miss: ${key}. Fetching from DB...`);
+
+    logSpy.mockRestore();
   });
 
-  test("should handle empty delivery options gracefully", async () => {
-    (prisma.product.findMany as any).mockResolvedValue(productsSeed);
-    (prisma.deliveryOption.findMany as any).mockResolvedValue([]);
+  test("handles zero or negative TTL", async () => {
+    redisMock.get.mockResolvedValueOnce(null);
 
-    const result = await seed();
+    await getOrSetCache(key, fetcher, 0);
+    expect(redisMock.setex).toHaveBeenCalledWith(key, 0, JSON.stringify(data));
 
-    expect(result).toEqual({ message: "Products or delivery options missing" });
-    expect(prisma.$disconnect).toHaveBeenCalled();
+    await getOrSetCache(key, fetcher, -5);
+    expect(redisMock.setex).toHaveBeenCalledWith(key, -5, JSON.stringify(data));
   });
 });

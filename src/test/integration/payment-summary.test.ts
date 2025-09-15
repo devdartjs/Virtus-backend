@@ -5,10 +5,17 @@ import { getPaymentSummaryRoute } from "../../modules/payment-summary/controller
 import { prisma } from "../../../prisma/database-prisma";
 import redis from "../../lib/redis/redis";
 
-let app: any;
+let app: Elysia;
+
+const TEST_HOST = "http://localhost";
+const BASE_PATH = "/api/v1/payment-summary";
+
+// helper para criar Request com path relativo
+const makeRequest = (path: string, init?: RequestInit) => new Request(`${TEST_HOST}${path}`, init);
 
 beforeAll(async () => {
   app = new Elysia().use(getPaymentSummaryRoute);
+
   await prisma.$connect();
   await redis.flushall();
 
@@ -66,11 +73,7 @@ afterAll(async () => {
 
 describe("GET /api/v1/payment-summary - Integration Test", () => {
   test("should return correct payment summary based on cart items", async () => {
-    const response = await app.handle(
-      new Request("http://localhost:3004/api/v1/payment-summary", {
-        method: "GET"
-      })
-    );
+    const response = await app.handle(makeRequest(BASE_PATH, { method: "GET" }));
 
     const body = await response.json();
     console.log("Payment summary object:", body);

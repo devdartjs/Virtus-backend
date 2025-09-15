@@ -1,78 +1,124 @@
-/* eslint no-console: ["error", { "allow": ["log", "error"] }] */
-import { describe, test, expect, beforeAll, afterAll } from "vitest";
+import { describe, test, expect, beforeEach, vi } from "vitest";
 import { Elysia } from "elysia";
+import { ordersRoute } from "../../modules/orders/controller-orders";
 import { prisma } from "../../../prisma/database-prisma";
-import { deliveryOptionsRoute } from "../../../src/modules/delivery-options/controller-do";
+import { createOrder } from "../../modules/orders/service-orders";
 
-let app: Elysia;
+const TEST_HOST = "http://localhost";
+const BASE_PATH = "/api/v1/orders";
 
-beforeAll(async () => {
-  await prisma.cartItem.deleteMany();
-  await prisma.deliveryOption.deleteMany();
+const makeRequest = (path: string, init?: RequestInit) => new Request(`${TEST_HOST}${path}`, init);
 
-  await prisma.deliveryOption.createMany({
-    data: [
-      { id: "fast", deliveryDays: 3, priceCents: 500 },
-      { id: "standard", deliveryDays: 7, priceCents: 0 }
-    ]
+vi.mock("../../../prisma/database-prisma", () => ({
+  prisma: {
+    order: { findMany: vi.fn(), findUnique: vi.fn() },
+    orderItem: { deleteMany: vi.fn() },
+    product: { findMany: vi.fn() },
+    deliveryOption: { findMany: vi.fn() },
+    cartItem: { findMany: vi.fn() }
+  }
+}));
+
+vi.mock("../../modules/orders/service-orders.ts", () => ({
+  createOrder: vi.fn()
+}));
+
+describe("POST /api/v1/orders", () => {
+  let app: Elysia;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    app = new Elysia().use(ordersRoute);
   });
 
-  app = new Elysia().use(deliveryOptionsRoute);
-});
+  test("creates an order successfully", async () => {
+    (prisma.cartItem.findMany as any).mockResolvedValue([
+      {
+        productId: "11111111-1111-1111-1111-111111111111",
+        quantity: 2,
+        estimatedDeliveryTimeMs: BigInt(86400000),
+        product: {
+          id: "11111111-1111-1111-1111-111111111111",
+          name: "Product A",
+          image: "image-a.png",
+          stars: 5,
+          ratingCount: 10,
+          priceCents: 500,
+          keywords: ["electronics"]
+        },
+        deliveryOptionId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+      }
+    ]);
 
-afterAll(async () => {
-  await prisma.$disconnect();
-});
+    (createOrder as any).mockResolvedValue({
+      id: "22222222-2222-2222-2222-222222222222",
+      orderTimeMs: BigInt(123456789),
+      totalCostCents: 1000,
+      items: [
+        {
+          productId: "11111111-1111-1111-1111-111111111111",
+          quantity: 2,
+          estimatedDeliveryTimeMs: BigInt(86400000),
+          product: {
+            id: "11111111-1111-1111-1111-111111111111",
+            name: "Product A",
+            image: "image-a.png",
+            stars: 5,
+            ratingCount: 10,
+            priceCents: 500,
+            keywords: ["electronics"]
+          }
+        }
+      ]
+    });
 
-describe("Delivery Options Integration", () => {
-  test("GET /api/v1/delivery-options should return delivery options", async () => {
-    const response = await app.handle(
-      new Request("http://localhost/api/v1/delivery-options", {
-        method: "GET"
-      })
-    );
-    expect(response.status).toBe(200);
+    const response = await app.handle(makeRequest(BASE_PATH, { method: "POST" }));
     const body = await response.json();
-    console.log("BODY => TEST: GET /api/v1/delivery-options should return delivery options", body);
 
-    expect(body).toHaveLength(2);
-    expect(body[0]).toMatchObject({
-      id: "fast",
-      deliveryDays: 3,
-      priceCents: 500
+    expect(response.status).toBe(201);
+    expect(body).toEqual({
+      id: "22222222-2222-2222-2222-222222222222",
+      orderTimeMs: 123456789,
+      totalCostCents: 1000,
+      products: [
+        {
+          productId: "11111111-1111-1111-1111-111111111111",
+          quantity: 2,
+          estimatedDeliveryTimeMs: 86400000,
+          product: {
+            id: "11111111-1111-1111-1111-111111111111",
+            name: "Product A",
+            image: "image-a.png",
+            stars: 5,
+            ratingCount: 10,
+            priceCents: 500,
+            keywords: ["electronics"]
+          }
+        }
+      ]
     });
   });
 
-  test("GET /api/v1/delivery-options?expand=estimatedDeliveryTime should include calculated field", async () => {
-    const response = await app.handle(
-      new Request("http://localhost/api/v1/delivery-options?expand=estimatedDeliveryTime", {
-        method: "GET"
-      })
-    );
-    expect(response.status).toBe(200);
-    const body = await response.json();
-    console.log(
-      "BODY => TEST: GET /api/v1/delivery-options?expand=estimatedDeliveryTime should include calculated field",
-      body
-    );
+  test("returns 400 when cart is empty", async () => {
+    (prisma.cartItem.findMany as any).mockResolvedValue([]);
+    const response = await app.handle(makeRequest(BASE_PATH, { method: "POST" }));
 
-    expect(body[0]).toHaveProperty("estimatedDeliveryTimeMs");
-    expect(typeof body[0].estimatedDeliveryTimeMs).toBe("number");
+    expect(response.status).toBe(400);
   });
 
-  test("GET /api/v1/delivery-options should return error 400 if there are no options", async () => {
-    await prisma.cartItem.deleteMany();
-    await prisma.deliveryOption.deleteMany();
+  test("returns 400 when createOrder throws an error", async () => {
+    (prisma.cartItem.findMany as any).mockResolvedValue([
+      {
+        productId: "11111111-1111-1111-1111-111111111111",
+        quantity: 1,
+        estimatedDeliveryTimeMs: BigInt(86400000),
+        product: null,
+        deliveryOptionId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+      }
+    ]);
+    (createOrder as any).mockRejectedValue(new Error("DB create error"));
 
-    const response = await app.handle(
-      new Request("http://localhost/api/v1/delivery-options", {
-        method: "GET"
-      })
-    );
-    expect(response.status).toBe(500);
-    const text = await response.text();
-    console.log("text:", text);
-
-    expect(text).toContain("No Delivery Options Available");
+    const response = await app.handle(makeRequest(BASE_PATH, { method: "POST" }));
+    expect(response.status).toBe(400);
   });
 });

@@ -33,7 +33,7 @@ jobs:
 
       # 4️⃣ Install dependencies
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
       - name: Reinstall @prisma/client
         run: bun add @prisma/client
 
@@ -71,7 +71,7 @@ jobs:
       - name: Create .env
         run: printf "%s\n" "${{ secrets.ENV }}" > .env
 
-      # 3️⃣ Start Docker Compose containers using environment variables
+      # 3️⃣ Start containers, wait for DB, apply migrations & seed and prepare node enviroment for Vitest
       - name: Set up Docker Compose
         env:
           DATABASE_URL: postgresql://dart:${{ secrets.POSTGRES_PASSWORD }}@db:5432/postgresdb
@@ -101,9 +101,20 @@ jobs:
           docker compose exec -T app4 bunx prisma generate
           docker compose exec -T app4 bunx prisma db seed
 
-      # 4️⃣ Run sonar and tests in containers
-      - name: Run tests (coverage)
-        run: docker compose exec -T app4 bun run test:unit:coverage
+      - name: Setup Node for Vitest
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Clean Node modules
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
+
+      # 4️⃣ Run tests out of Docker container and then SonarCloud scan
+      - name: Run tests (to generate coverage/lcov.info file for sonar)
+        run: npx vitest run --coverage
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
@@ -114,7 +125,7 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=src
             -Dsonar.tests=src/test
-            -Dsonar.exclusions=src/test/**
+            -Dsonar.exclusions=src/test/**,dist/**,dist/prisma/migrations/**,prisma/migrations/**,**/*.sql
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.branch.name=main

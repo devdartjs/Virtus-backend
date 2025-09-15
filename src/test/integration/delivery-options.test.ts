@@ -1,8 +1,12 @@
-/* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import { describe, test, expect, beforeAll, afterAll } from "vitest";
 import { Elysia } from "elysia";
 import { prisma } from "../../../prisma/database-prisma";
 import { deliveryOptionsRoute } from "../../../src/modules/delivery-options/controller-do";
+
+const TEST_HOST = "http://localhost";
+const BASE_PATH = "/api/v1/delivery-options";
+
+const makeRequest = (path: string, init?: RequestInit) => new Request(`${TEST_HOST}${path}`, init);
 
 let app: Elysia;
 
@@ -25,16 +29,11 @@ afterAll(async () => {
 });
 
 describe("Delivery Options Integration", () => {
-  test("GET /api/v1/delivery-options should return delivery options", async () => {
-    const response = await app.handle(
-      new Request("http://localhost/api/v1/delivery-options", {
-        method: "GET"
-      })
-    );
+  test("GET /api/v1/delivery-options returns all delivery options", async () => {
+    const response = await app.handle(makeRequest(BASE_PATH, { method: "GET" }));
     expect(response.status).toBe(200);
-    const body = await response.json();
-    console.log("BODY => TEST: GET /api/v1/delivery-options should return delivery options", body);
 
+    const body = await response.json();
     expect(body).toHaveLength(2);
     expect(body[0]).toMatchObject({
       id: "fast",
@@ -43,36 +42,25 @@ describe("Delivery Options Integration", () => {
     });
   });
 
-  test("GET /api/v1/delivery-options?expand=estimatedDeliveryTime should include calculated field", async () => {
+  test("GET /api/v1/delivery-options?expand=estimatedDeliveryTime includes calculated field", async () => {
     const response = await app.handle(
-      new Request("http://localhost/api/v1/delivery-options?expand=estimatedDeliveryTime", {
-        method: "GET"
-      })
+      makeRequest(`${BASE_PATH}?expand=estimatedDeliveryTime`, { method: "GET" })
     );
     expect(response.status).toBe(200);
-    const body = await response.json();
-    console.log(
-      "BODY => TEST: GET /api/v1/delivery-options?expand=estimatedDeliveryTime should include calculated field",
-      body
-    );
 
+    const body = await response.json();
     expect(body[0]).toHaveProperty("estimatedDeliveryTimeMs");
     expect(typeof body[0].estimatedDeliveryTimeMs).toBe("number");
   });
 
-  test("GET /api/v1/delivery-options should return error 400 if there are no options", async () => {
+  test("GET /api/v1/delivery-options returns error 500 if no options exist", async () => {
     await prisma.cartItem.deleteMany();
     await prisma.deliveryOption.deleteMany();
 
-    const response = await app.handle(
-      new Request("http://localhost/api/v1/delivery-options", {
-        method: "GET"
-      })
-    );
+    const response = await app.handle(makeRequest(BASE_PATH, { method: "GET" }));
     expect(response.status).toBe(500);
-    const text = await response.text();
-    console.log("text:", text);
 
+    const text = await response.text();
     expect(text).toContain("No Delivery Options Available");
   });
 });
