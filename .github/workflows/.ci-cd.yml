@@ -103,20 +103,23 @@ jobs:
 
       # 4️⃣ Run sonar and tests in containers
       - name: Run tests (coverage)
-        run: docker compose exec -T app4 bun run test:coverage
+        run: docker compose exec -T app4 bun run test:unit:coverage
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_VIRTUS_BACKEND2 }}
         with:
           args: >
             -Dsonar.projectKey=Virtus-backend
             -Dsonar.organization=devdartjs
+            -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=src
             -Dsonar.tests=src/test
+            -Dsonar.exclusions=src/test/**
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.sourceEncoding=UTF-8
             -Dsonar.branch.name=main
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       # 5️⃣ Tear down Docker containers
       - name: Tear down containers

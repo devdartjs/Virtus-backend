@@ -24,15 +24,17 @@ export const ProductErrorHandler = new Elysia()
       typeof error === "object" &&
       error !== null &&
       "on" in error &&
-      (error as any).on === "response"
+      (error as ResponseValidationError).on === "response"
     ) {
+      const respError = error as ResponseValidationError;
+
       return {
         status: 422,
         body: {
           message: "Erro na validação da resposta da API",
           code: "RESPONSE_VALIDATION_ERROR",
-          summary: (error as any).summary ?? "Erro desconhecido",
-          details: (error as any).errors ?? []
+          summary: respError.summary ?? "Erro desconhecido",
+          details: respError.errors ?? []
         }
       };
     }

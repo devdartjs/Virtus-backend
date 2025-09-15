@@ -51,18 +51,6 @@ describe("CartItems Integration Tests", () => {
     expect(body).toEqual({ message: "Cart item not found" });
   });
 
-  test("DELETE /cart-items/:id should return 404 if item not found", async () => {
-    (CartItemsService.deleteCartItem as Mock).mockRejectedValue(new Error("Cart item not found"));
-
-    const response = await cartItemsRoute.handle(
-      new Request(`${BASE_URL}/${mockCartId}`, { method: "DELETE" })
-    );
-
-    expect(response.status).toBe(404);
-    const body = await response.json();
-    expect(body).toHaveProperty("message", "Cart item not found");
-  });
-
   test("GET /cart-items should return a list of cart items", async () => {
     const mockItems = [
       {

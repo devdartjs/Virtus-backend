@@ -3,6 +3,7 @@ src/generated
 .git
 *.log
 .vscode
+.scannerwork
 *.md
 *.tsbuildinfo
 

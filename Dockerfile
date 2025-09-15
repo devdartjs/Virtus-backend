@@ -7,6 +7,7 @@ RUN bun install --frozen-lockfile
 
 COPY prisma ./prisma
 COPY src ./src
+
 # COPY .env .
 # COPY .env.stage .
 # RUN bun run build
