@@ -111,10 +111,16 @@ jobs:
         run: |
           rm -rf node_modules package-lock.json
           npm install
+      - name: Test DB connection
+        run: |
+          apt-get update && apt-get install -y postgresql-client
+          pg_isready -h localhost -p 5432 -U dart
 
       # 4️⃣ Run tests out of Docker container and then SonarCloud scan
       - name: Run tests (to generate coverage/lcov.info file for sonar)
         run: npx vitest run --coverage
+        env:
+          DATABASE_URL: postgresql://dart:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/postgresdb
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
