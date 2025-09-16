@@ -101,43 +101,9 @@ jobs:
           docker compose exec -T app4 bunx prisma generate
           docker compose exec -T app4 bunx prisma db seed
 
-      - name: Setup Node for Vitest
-        uses: actions/setup-node@v3
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - name: Clean Node modules
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
-      - name: Test DB connection
-        run: |
-          apt-get update && apt-get install -y postgresql-client
-          pg_isready -h localhost -p 5432 -U dart
-
-      # 4️⃣ Run tests out of Docker container and then SonarCloud scan
+      # 4️⃣ Run tests (coverage)
       - name: Run tests (to generate coverage/lcov.info file for sonar)
-        run: npx vitest run --coverage
-        env:
-          DATABASE_URL: postgresql://dart:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/postgresdb
-
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v2
-        with:
-          args: >
-            -Dsonar.projectKey=Virtus-backend
-            -Dsonar.organization=devdartjs
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.sources=src
-            -Dsonar.tests=src/test
-            -Dsonar.exclusions=src/test/**,dist/**,dist/prisma/migrations/**,prisma/migrations/**,**/*.sql
-            -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
-            -Dsonar.sourceEncoding=UTF-8
-            -Dsonar.branch.name=main
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
+        run: docker compose exec -T app4 bun run test:coverage
       # 5️⃣ Tear down Docker containers
       - name: Tear down containers
         run: docker compose down --volumes --remove-orphans

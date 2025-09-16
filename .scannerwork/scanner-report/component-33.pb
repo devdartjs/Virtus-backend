@@ -1,1 +1,1 @@
-! (2tsXêhr:src/test/modules/cartItemsService/cartItemsService.test.ts
+! (2tsXZhr,src/test/integration/payment-summary.test.ts

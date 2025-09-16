@@ -5,15 +5,12 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install
 
-COPY prisma ./prisma
-COPY src ./src
+COPY . .
+RUN bun run build
 
-# COPY .env .
-# COPY .env.stage .
-# RUN bun run build
-ARG ENV_FILE
-COPY ${ENV_FILE} .env
-RUN bun run build:stage
+# ARG ENV_FILE
+# COPY ${ENV_FILE} .env
+# RUN bun run build:stage
 
 # Runtime
 FROM oven/bun:1.1.13-slim AS runtime
@@ -25,6 +22,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates curl gnupg \
   && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
   && apt-get install -y --no-install-recommends nodejs \
+  && npm install -g sonar-scanner \
   && apt-get purge -y --auto-remove curl gnupg \
   && rm -rf /var/lib/apt/lists/*  
 
