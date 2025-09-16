@@ -180,18 +180,18 @@ jobs:
       # 3️⃣ Login to Fly.io
       - name: Fly login using token
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_VIRTUS_BACKEND }}
         run: flyctl auth token
 
       # 4️⃣ Deploy Docker image to Fly.io stage
       - name: Deploy to stage
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_VIRTUS_BACKEND }}
         run: |
           flyctl deploy \
             --app my-app-stage \
             --image dartw/virtus-backend:dev \
-            --region ord \
+            --region gru \
             --strategy immediate
 
       # 5️⃣ Optional: wait a few seconds for the app to become healthy
