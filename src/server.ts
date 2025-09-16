@@ -50,15 +50,18 @@ export const app = new Elysia()
   .use(resetRoute)
   .use(getPaymentSummaryRoute)
   .get("/", ({ headers }) => {
-    return {
-      message: "Hello Elysia",
-      realIp: headers["x-real-ip"] ?? "not provided",
-      forwardedFor: headers["x-forwarded-for"] ?? "not provided",
-      userAgent: headers["user-agent"] ?? "unknown",
-      host: headers["host"] ?? "unknown",
-      protocol: headers["x-forwarded-proto"] ?? "http",
-      timestamp: new Date().toISOString()
-    };
+    if (isDevOrStage) {
+      return {
+        message: "Hello Elysia",
+        realIp: headers["x-real-ip"] ?? "not provided",
+        forwardedFor: headers["x-forwarded-for"] ?? "not provided",
+        userAgent: headers["user-agent"] ?? "unknown",
+        host: headers["host"] ?? "unknown",
+        protocol: headers["x-forwarded-proto"] ?? "http",
+        timestamp: new Date().toISOString()
+      };
+    }
+    return "Elysia server is up and running!";
   })
   .listen(process.env.PORT || 5000);
 

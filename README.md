@@ -1,7 +1,7 @@
 # 🟢 Virtus Backend
 
-A modular and type-safe RESTful backend for the **Virtus eCommerce Platform**, built with **Bun**, **Elysia.js**, and **TypeScript**, powered by **Prisma ORM** and **PostgreSQL** with **Docker**.  
-Tested with **Vitest**, documented with **Swagger (OpenAPI 3.0)**, instrumented with **OpenTelemetry** for simple observability and logs.
+A modular and type-safe RESTful backend for the **Virtus eCommerce Platform**, built with **Bun**, **Elysia.js**, and **TypeScript**, using **Docker** and **PostgreSQL** as relational database with **Prisma** as ORM.  
+This backend was tested with **Vitest**, documented with **Swagger (OpenAPI 3.0)**.
 
 ---
 
@@ -21,17 +21,21 @@ Tested with **Vitest**, documented with **Swagger (OpenAPI 3.0)**, instrumented 
 
 ---
 
-## 🟠 Features
+## 🟠 Some Features
 
-- ⚡️ Runtime with **Bun** + **Elysia.js**
-- 🔄 RESTful API with full CRUD support
-- 🛡️ Request validation using **Zod** | **Elysia t Schemas** schemas
-- 🧠 **PostgreSQL** database via **Prisma ORM** with **Adminer container**
-- 📦 Containers with **Docker**
-- 📄 API'S Fully documented using **Swagger UI (OpenAPI 3.0)**
-- 🔍 Observability with structured logs via **OpenTelemetry**
-- 🧪 Unit and integration testing with **Vitest**
-- ✨ Type-safe codebase written entirely in **TypeScript**
+🔄 CRUD Support: Manage eCommerce resources like products and orders consistently.
+
+🛡 Automatic Request Validation: Ensures data integrity and security.
+
+🧠 Data Persistence: PostgreSQL database managed via Prisma ORM.
+
+📄 Documented API: Swagger UI makes endpoints easy to explore and test.
+
+🔍 Integrated Observability: Structured logs and metrics with OpenTelemetry for monitoring and debugging.
+
+🧪 Testing: Unit and integration tests powered by Vitest.
+
+📦 Production-Ready: Dockerized setup, easy to run in any environment.
 
 ---
 
@@ -40,12 +44,13 @@ Tested with **Vitest**, documented with **Swagger (OpenAPI 3.0)**, instrumented 
 - **Bun** as JavaScript/TypeScript runtime
 - **Elysia.js** as Web framework
 - **TypeScript** for type safety
-- **Prisma ORM** + **PostgreSQL** as database layer
+- **PostgreSQL** as database layer with **Prisma ORM**
 - **Docker** and **Docker-Hub**
-- **Zod | Elysia t** for runtime schema validation
+- **Elysia t** for runtime schema validation
 - **Swagger** / **OpenAPI 3.0** for API documentation
 - **OpenTelemetry** for observability and logging
 - **Vitest** for testing
+- **SonarQube** and **snyk** as SAST tool
 
 ---
 
@@ -76,25 +81,25 @@ Swagger UI: http://localhost:3000/swagger
 
 ```bash
 git clone https://github.com/devdartjs/Virtus-backend.git
-cd virtus-backend
-docker-compose --profile <env> up --build
+cd virtus-backend/app/
+docker-compose --profile <"env" > up --build
 ```
 
-Replace <env> with:
+Replace <"env"> with:
 
-dev → Development
+- dev → Development with Adminer (Database UI)
+- stage → Staging
+- test → Testing
 
-stage → Staging
+### ⚪ Testing
 
-test → Testing
-
-Adminer (Database UI): http://localhost:8080
+```bash
+bun run test:coverage
+```
 
 ### ⚪ Testing inside containers
 
 ```bash
 docker-compose --profile test up --build -d
-docker ps
-docker exec -it <app_container> sh
-bun run test:coverage
+docker exec <app_container > bun run test:coverage
 ```
