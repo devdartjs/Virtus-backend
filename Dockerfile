@@ -6,11 +6,8 @@ COPY package.json bun.lock ./
 RUN bun install
 
 COPY . .
-RUN bun run build
-
-# ARG ENV_FILE
-# COPY ${ENV_FILE} .env
-# RUN bun run build:stage
+# RUN bun run build
+RUN bun run build:stage
 
 # Runtime
 FROM oven/bun:1.1.13-slim AS runtime

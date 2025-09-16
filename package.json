@@ -23,7 +23,7 @@
     "build:bundle": "bun build src/server.ts --outfile dist/server.js --minify --target bun",
     "build:copy": "cp .env dist/.env && cp .env.stage dist/.env.stage && cp -R prisma dist/prisma",
     "build:stage": "bun run build:bundle && bun run build:copy:stage",
-    "build:copy:stage": "cp -f .env dist/.env || true && cp -f .env.stage dist/.env.stage || true && cp -R prisma dist/prisma",
+    "build:copy:stage": "cp .env dist/.env || true && cp .env.stage dist/.env.stage || true && cp -R prisma dist/prisma",
     "sonar": "sonar-scanner",
     "stage": "BUN_ENV=stage bun run dist/server.js",
     "prod": "BUN_ENV=prod bun run dist/server.js",
