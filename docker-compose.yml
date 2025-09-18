@@ -23,7 +23,6 @@ services:
         limits:
           memory: 512m
           cpus: "0.5"
-
   adminer:
     image: adminer
     restart: always
@@ -40,7 +39,6 @@ services:
         limits:
           memory: 256m
           cpus: "0.25"
-
   app:
     build: .
     restart: always
@@ -61,7 +59,6 @@ services:
         limits:
           memory: 512m
           cpus: "0.5"
-
   app1:
     build: .
     restart: always
@@ -82,7 +79,6 @@ services:
         limits:
           memory: 512m
           cpus: "0.5"
-
   app2:
     build: .
     restart: always
@@ -103,7 +99,6 @@ services:
         limits:
           memory: 512m
           cpus: "0.5"
-
   app3:
     build: .
     restart: always
@@ -124,7 +119,6 @@ services:
         limits:
           memory: 512m
           cpus: "0.5"
-
   nginx:
     image: nginx:alpine
     container_name: nginx
@@ -145,7 +139,6 @@ services:
         limits:
           memory: 256m
           cpus: "0.25"
-
   redis:
     image: redis:7
     container_name: redis
@@ -156,6 +149,7 @@ services:
     profiles:
       - stage
       - test
+      - test-stage
       - snyk
     deploy:
       resources:
@@ -190,7 +184,6 @@ services:
         limits:
           memory: 512m
           cpus: "0.5"
-
   snyk:
     image: snyk/snyk-cli:docker
     container_name: snyk
@@ -213,6 +206,36 @@ services:
         limits:
           memory: 256m
           cpus: "0.25"
+  app4-stage:
+    build:
+      context: .
+      dockerfile: Dockerfile.stage
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      BUN_ENV: stage
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - app-network
+    profiles:
+      - test-stage
+    env_file:
+      - .env.stage
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.5"
 
 volumes:
   db_data:

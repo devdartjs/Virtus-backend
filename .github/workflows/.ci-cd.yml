@@ -102,7 +102,7 @@ jobs:
           docker compose exec -T app4 bunx prisma db seed
 
       # 4️⃣ Run tests (coverage)
-      - name: Run tests (to generate coverage/lcov.info file for sonar)
+      - name: Run tests (unit & integration)
         run: docker compose exec -T app4 bun run test:coverage
       # 5️⃣ Tear down Docker containers
       - name: Tear down containers

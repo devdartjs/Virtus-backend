@@ -6,8 +6,7 @@ COPY package.json bun.lock ./
 RUN bun install
 
 COPY . .
-# RUN bun run build
-RUN bun run build:stage
+RUN bun run build
 
 # Runtime
 FROM oven/bun:1.1.13-slim AS runtime
@@ -19,7 +18,6 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates curl gnupg \
   && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
   && apt-get install -y --no-install-recommends nodejs \
-  && npm install -g sonar-scanner \
   && apt-get purge -y --auto-remove curl gnupg \
   && rm -rf /var/lib/apt/lists/*  
 

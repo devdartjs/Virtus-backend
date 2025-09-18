@@ -1,4 +1,5 @@
 /* eslint no-console: ["error", { "allow": ["log", "error", "warn"] }] */
+/* eslint-disable indent */
 import { prisma } from "./database-prisma";
 import seedProducts from "../src/lib/seed-functions/seedProducts";
 import seedDeliveryOptions from "../src/lib/seed-functions/seedDeliveryOptions";
@@ -107,7 +108,6 @@ export async function seed() {
 }
 
 seed().catch((e) => {
-    console.error("Failed to seed database:", e);
-    throw e;
-  });
-
+  console.error("Failed to seed database:", e);
+  throw e;
+});

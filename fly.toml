@@ -1,22 +1,20 @@
-# fly.toml app configuration file generated for app-wild-dust-1031 on 2025-08-08T11:22:25-03:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
-app = 'app-wild-dust-1031'
-primary_region = 'gig'
+app = "app-autumn-water-7457"
 
 [build]
+  image = "dartw/app:stage"
 
-[http_service]
+[env]
+  PORT = "3000"
+  BUN_ENV = "stage"
+
+[[services]]
   internal_port = 3000
-  force_https = true
-  auto_stop_machines = 'stop'
-  auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+  protocol = "tcp"
 
-[[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
-  cpus = 1
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
