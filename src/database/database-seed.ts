@@ -1,8 +1,7 @@
 /* eslint no-console: ["error", { "allow": ["log", "error", "warn"] }] */
-/* eslint-disable indent */
 import { prisma } from "./database-prisma";
-import seedProducts from "../src/lib/seed-functions/seedProducts";
-import seedDeliveryOptions from "../src/lib/seed-functions/seedDeliveryOptions";
+import seedProducts from "../lib/seed-functions/seedProducts";
+import seedDeliveryOptions from "../lib/seed-functions/seedDeliveryOptions";
 
 export async function seed() {
   try {

@@ -1,5 +1,5 @@
 import { CartItem } from "@prisma/client";
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 
 export class CartItemsService {
   static async getCartItems(): Promise<CartItem[]> {

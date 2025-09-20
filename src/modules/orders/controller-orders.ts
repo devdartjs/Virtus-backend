@@ -3,7 +3,7 @@ import { Elysia, t } from "elysia";
 import { record } from "@elysiajs/opentelemetry";
 import { OrdersQuerySchema, OrdersResponseSchema, OrderSchema } from "./schema.orders";
 import { listOrders, createOrder, getOrderById } from "./service-orders";
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 
 export const ordersRoute = new Elysia({ prefix: "/api/v1/orders" })
   .get(

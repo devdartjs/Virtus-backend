@@ -1,6 +1,6 @@
 import { describe, test, vi, beforeEach, expect } from "vitest";
-import { seed } from "../../../prisma/database-seed";
-import { prisma } from "../../../prisma/database-prisma";
+import { seed } from "../../database/database-seed";
+import { prisma } from "../../database/database-prisma";
 
 import productsSeed from "../../lib/utils/productsSeed";
 import deliveryOptionsSeed from "../../lib/utils/deliveryOptionsSeed";

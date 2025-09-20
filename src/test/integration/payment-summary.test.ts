@@ -2,7 +2,7 @@
 import { describe, test, expect, beforeAll, afterAll } from "vitest";
 import { Elysia } from "elysia";
 import { getPaymentSummaryRoute } from "../../modules/payment-summary/controller-ps";
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 import redis from "../../lib/redis/redis";
 
 let app: Elysia;

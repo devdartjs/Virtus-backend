@@ -1,6 +1,6 @@
 /* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import { Elysia } from "elysia";
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 
 export const getPaymentSummaryRoute = new Elysia({
   prefix: "/api/v1/payment-summary"

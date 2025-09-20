@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll, afterAll } from "vitest";
 import { Elysia } from "elysia";
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 import { deliveryOptionsRoute } from "../../../src/modules/delivery-options/controller-do";
 
 const TEST_HOST = "http://localhost";

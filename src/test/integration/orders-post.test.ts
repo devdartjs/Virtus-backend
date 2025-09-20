@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach, vi } from "vitest";
 import { Elysia } from "elysia";
 import { ordersRoute } from "../../modules/orders/controller-orders";
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 import { createOrder } from "../../modules/orders/service-orders";
 
 const TEST_HOST = "http://localhost";
