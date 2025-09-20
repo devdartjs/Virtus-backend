@@ -21,9 +21,7 @@ services:
     profiles:
       - test
       - test-stage
-    env_file:
-      - .env.development
-      - .env.test
+      - db
     deploy:
       resources:
         limits:
@@ -216,7 +214,7 @@ services:
   app4-stage:
     build:
       context: .
-      dockerfile: Dockerfile.stagenode
+      dockerfile: Dockerfile.stage
     restart: always
     ports:
       - "3001:3000"

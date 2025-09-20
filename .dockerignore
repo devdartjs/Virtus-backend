@@ -15,8 +15,10 @@ src/generated
 **/*.bun
 /src/generated/prisma
 
-
-.env.development.local
-.env.test.local
 .github
 .github/workflows
+README.md
+sonar-project.properties
+Nginx.conf
+.env.development
+
