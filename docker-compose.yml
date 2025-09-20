@@ -4,24 +4,30 @@ services:
     restart: always
     shm_size: 128mb
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: dart
+      POSTGRES_PASSWORD: nghk98734
+      POSTGRES_DB: postgresdb
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U dart -d postgresdb"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
       - app-network
+    profiles:
+      - test
+      - test-stage
+    env_file:
+      - .env.development
+      - .env.test
     deploy:
       resources:
         limits:
-          memory: 512m
+          memory: 1g
           cpus: "0.5"
   adminer:
     image: adminer
@@ -162,6 +168,7 @@ services:
     ports:
       - "3004:3000"
     environment:
+      BUN_ENV: development
       DATABASE_URL: ${DATABASE_URL}
       PORT: ${PORT}
       REDIS_HOST: redis
@@ -178,7 +185,7 @@ services:
       - test
       - snyk
     env_file:
-      - .env
+      - .env.development
     deploy:
       resources:
         limits:
@@ -209,12 +216,12 @@ services:
   app4-stage:
     build:
       context: .
-      dockerfile: Dockerfile.stage
+      dockerfile: Dockerfile.stagenode
     restart: always
     ports:
       - "3001:3000"
     environment:
-      BUN_ENV: stage
+      BUN_ENV: test
       DATABASE_URL: ${DATABASE_URL}
       PORT: ${PORT}
       REDIS_HOST: redis
@@ -230,11 +237,11 @@ services:
     profiles:
       - test-stage
     env_file:
-      - .env.stage
+      - .env.test
     deploy:
       resources:
         limits:
-          memory: 512m
+          memory: 1g
           cpus: "0.5"
 
 volumes:

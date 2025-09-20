@@ -28,8 +28,10 @@ yarn-error.log*
 .env
 .env.prisma
 .env.stage
-.env.prod
+.env.test
+.env.production
 .env.local
+.env.development
 .env.development.local
 .env.test.local
 .env.production.local

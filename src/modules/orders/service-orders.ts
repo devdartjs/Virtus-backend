@@ -64,7 +64,7 @@ function mapOrderItem(
 
 export async function listOrders(expandProduct: boolean) {
   const orders = await prisma.order.findMany({
-    include: { items: { include: { product: expandProduct } } }
+    include: { items: { include: { product: expandProduct ? true : false } } }
   });
 
   return orders.map((order) => ({
@@ -130,7 +130,7 @@ export async function createOrder(cart: CartItem[]) {
 export async function getOrderById(orderId: string, expandProduct: boolean) {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
-    include: { items: { include: { product: expandProduct } } }
+    include: { items: { include: { product: expandProduct ? true : false } } }
   });
 
   if (!order) {

@@ -16,13 +16,15 @@ import { resetRoute } from "./modules/reset/controller-reset";
 import { getPaymentSummaryRoute } from "./modules/payment-summary/controller-ps";
 import { ProductService } from "./modules/products/service-products";
 
-if (process.env.BUN_ENV === "stage") {
+if (process.env.BUN_ENV === "test || test.local") {
   ProductService.preloadCache()
     .then(() => console.log("Product cache successfully preloaded"))
     .catch((err) => console.error("Error preloading cache:", err));
 }
 
-const isDevOrStage = ["development", "stage"].includes(process.env.BUN_ENV || "");
+export const isDevOrTest = ["development", "development.local", "test", "test.local"].includes(
+  process.env.BUN_ENV || ""
+);
 
 export const app = new Elysia()
   .use(cors())
@@ -30,7 +32,7 @@ export const app = new Elysia()
   .use(
     opentelemetry({
       spanProcessors: [
-        ...(isDevOrStage
+        ...(isDevOrTest
           ? [
               new BatchSpanProcessor(new ConsoleSpanExporter()),
               new BatchSpanProcessor(
@@ -50,7 +52,7 @@ export const app = new Elysia()
   .use(resetRoute)
   .use(getPaymentSummaryRoute)
   .get("/", ({ headers }) => {
-    if (isDevOrStage) {
+    if (isDevOrTest) {
       return {
         message: "Hello Elysia",
         realIp: headers["x-real-ip"] ?? "not provided",
@@ -58,17 +60,18 @@ export const app = new Elysia()
         userAgent: headers["user-agent"] ?? "unknown",
         host: headers["host"] ?? "unknown",
         protocol: headers["x-forwarded-proto"] ?? "http",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        env: process.env.BUN_ENV || "not set"
       };
     }
     return "Elysia server is up and running!";
   })
   .listen({
-    port: parseInt(process.env.PORT || "3000"),
+    port: parseInt(process.env.PORT || "5000"),
     hostname: "0.0.0.0"
   });
 
-if (isDevOrStage) {
+if (isDevOrTest) {
   console.log(`
     ✅ Elysia Server is running at http://${app.server?.hostname}:${app.server?.port}
     ✅ Jaeger.UI is running at http://localhost:16686

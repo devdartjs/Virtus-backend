@@ -14,3 +14,9 @@ src/generated
 **/*.log
 **/*.bun
 /src/generated/prisma
+
+
+.env.development.local
+.env.test.local
+.github
+.github/workflows
