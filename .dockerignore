@@ -20,5 +20,5 @@ src/generated
 README.md
 sonar-project.properties
 Nginx.conf
-.env.development
+
 

@@ -1,17 +1,16 @@
 # Builder
-FROM oven/bun:1.1.13 AS builder
+FROM oven/bun:alpine AS builder
 WORKDIR /app
 
 COPY package.json bun.lock ./
 RUN bun install
 
 COPY . .
-# RUN bun run build:development
-RUN bun run prisma:generate
-RUN bun run build
+
+
 
 # Runtime
-FROM oven/bun:1.1.13-slim AS runtime
+FROM oven/bun:alpine AS runtime
 WORKDIR /app
 COPY --from=builder /app .
 
@@ -23,12 +22,17 @@ COPY --from=builder /app .
 #   && apt-get purge -y --auto-remove curl gnupg \
 #   && rm -rf /var/lib/apt/lists/* 
 
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/bun.lock ./bun.lock
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/build ./build
+COPY --from=builder /app/.env .env
+
+
   
 EXPOSE 3000
-CMD ["sh", "-c", "bunx prisma migrate deploy && bunx prisma generate && bunx prisma db seed && bun run src/server.ts"]
+CMD ["sh", "-c", "bunx prisma migrate deploy && bunx prisma generate && bunx prisma db seed && bun run build/server.js"]
 # CMD ["sh", "-c", "bunx prisma migrate deploy && bunx prisma generate && bunx prisma db seed && bun run dist/server/server.js"]
 
 

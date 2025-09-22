@@ -19,130 +19,130 @@ services:
     networks:
       - app-network
     profiles:
+      - dev
       - test
-      - test-stage
       - db
     deploy:
       resources:
         limits:
           memory: 1g
           cpus: "0.5"
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-    networks:
-      - app-network
-    profiles:
-      - dev
-    deploy:
-      resources:
-        limits:
-          memory: 256m
-          cpus: "0.25"
-  app:
-    build: .
-    restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - app-network
-    profiles:
-      - dev
-    deploy:
-      resources:
-        limits:
-          memory: 512m
-          cpus: "0.5"
-  app1:
-    build: .
-    restart: always
-    ports:
-      - "3001:3000"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - app-network
-    profiles:
-      - stage
-    deploy:
-      resources:
-        limits:
-          memory: 512m
-          cpus: "0.5"
-  app2:
-    build: .
-    restart: always
-    ports:
-      - "3002:3000"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - app-network
-    profiles:
-      - stage
-    deploy:
-      resources:
-        limits:
-          memory: 512m
-          cpus: "0.5"
-  app3:
-    build: .
-    restart: always
-    ports:
-      - "3003:3000"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - app-network
-    profiles:
-      - stage
-    deploy:
-      resources:
-        limits:
-          memory: 512m
-          cpus: "0.5"
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - app1
-      - app2
-      - app3
-    networks:
-      - app-network
-    profiles:
-      - stage
-    deploy:
-      resources:
-        limits:
-          memory: 256m
-          cpus: "0.25"
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - dev
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 256m
+  #         cpus: "0.25"
+  # app:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL}
+  #     PORT: ${PORT}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - dev
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 512m
+  #         cpus: "0.5"
+  # app1:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - "3001:3000"
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL}
+  #     PORT: ${PORT}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - stage
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 512m
+  #         cpus: "0.5"
+  # app2:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - "3002:3000"
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL}
+  #     PORT: ${PORT}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - stage
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 512m
+  #         cpus: "0.5"
+  # app3:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - "3003:3000"
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL}
+  #     PORT: ${PORT}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - stage
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 512m
+  #         cpus: "0.5"
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: nginx
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #   depends_on:
+  #     - app1
+  #     - app2
+  #     - app3
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - stage
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 256m
+  #         cpus: "0.25"
   redis:
     image: redis:7
     container_name: redis
@@ -152,8 +152,8 @@ services:
       - app-network
     profiles:
       - stage
+      - dev
       - test
-      - test-stage
       - snyk
     deploy:
       resources:
@@ -179,11 +179,15 @@ services:
         condition: service_started
     networks:
       - app-network
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - ./.env:/app/.env
     profiles:
-      - test
+      - dev
       - snyk
     env_file:
-      - .env.development
+      - .env
     deploy:
       resources:
         limits:
@@ -233,9 +237,9 @@ services:
     networks:
       - app-network
     profiles:
-      - test-stage
+      - test
     env_file:
-      - .env.test
+      - .env
     deploy:
       resources:
         limits:
