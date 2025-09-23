@@ -106,7 +106,9 @@ export async function seed() {
   }
 }
 
-seed().catch((e) => {
+try {
+  await seed();
+} catch (e) {
   console.error("Failed to seed database:", e);
   throw e;
-});
+}

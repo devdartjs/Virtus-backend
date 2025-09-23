@@ -40,10 +40,10 @@ export class CartItemsService {
     return await prisma.cartItem.update({
       where: { id },
       data: {
-        ...(data.quantity !== undefined ? { quantity: data.quantity } : {}),
-        ...(data.deliveryOptionId !== undefined
-          ? { deliveryOption: { connect: { id: data.deliveryOptionId } } }
-          : {})
+        ...(data.quantity === undefined ? {} : { quantity: data.quantity }),
+        ...(data.deliveryOptionId === undefined
+          ? {}
+          : { deliveryOption: { connect: { id: data.deliveryOptionId } } })
       },
       select: {
         id: true,

@@ -1,6 +1,6 @@
 /* eslint no-console: ["error", { "allow": ["log", "error"] }] */
-import { existsSync } from "fs";
-import { join } from "path";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import dotenv from "dotenv";
 
 // 1️⃣ Detecta BUN_ENV de várias fontes, com fallback

@@ -16,10 +16,13 @@ import { resetRoute } from "./modules/reset/controller-reset";
 import { getPaymentSummaryRoute } from "./modules/payment-summary/controller-ps";
 import { ProductService } from "./modules/products/service-products";
 
-if (process.env.BUN_ENV === "test || test.local") {
-  ProductService.preloadCache()
-    .then(() => console.log("Product cache successfully preloaded"))
-    .catch((err) => console.error("Error preloading cache:", err));
+if (process.env.BUN_ENV === "test" || process.env.BUN_ENV === "test.local") {
+  try {
+    await ProductService.preloadCache();
+    console.log("Product cache successfully preloaded");
+  } catch (err) {
+    console.error("Error preloading cache:", err);
+  }
 }
 
 export const isDevOrTest = ["development", "development.local", "test", "test.local"].includes(
