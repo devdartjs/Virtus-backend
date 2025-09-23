@@ -9,7 +9,7 @@ const BASE_PATH = "/api/v1/orders";
 
 const makeRequest = (path: string, init?: RequestInit) => new Request(`${TEST_HOST}${path}`, init);
 
-vi.mock("../../../prisma/database-prisma", () => ({
+vi.mock("../../database/database-prisma.ts", () => ({
   prisma: {
     order: { findMany: vi.fn(), findUnique: vi.fn() },
     orderItem: { deleteMany: vi.fn() },

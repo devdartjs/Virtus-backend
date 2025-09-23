@@ -5,7 +5,7 @@ import { prisma } from "../../database/database-prisma";
 import productsSeed from "../../lib/utils/productsSeed";
 import deliveryOptionsSeed from "../../lib/utils/deliveryOptionsSeed";
 
-vi.mock("../../../prisma/database-prisma", () => ({
+vi.mock("../../database/database-prisma.ts", () => ({
   prisma: {
     product: {
       count: vi.fn(),
