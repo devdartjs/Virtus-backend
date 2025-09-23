@@ -20,7 +20,7 @@ services:
       - app-network
     profiles:
       - dev
-      - test
+      - stage
       - db
     deploy:
       resources:
@@ -166,7 +166,6 @@ services:
     ports:
       - "3004:3000"
     environment:
-      BUN_ENV: development
       DATABASE_URL: ${DATABASE_URL}
       PORT: ${PORT}
       REDIS_HOST: redis
@@ -182,12 +181,12 @@ services:
     volumes:
       - ./src:/app/src
       - ./prisma:/app/prisma
-      - ./.env:/app/.env
+      - ./.env.development:/app/.env.development
     profiles:
       - dev
       - snyk
     env_file:
-      - .env
+      - .env.development
     deploy:
       resources:
         limits:
@@ -237,9 +236,13 @@ services:
     networks:
       - app-network
     profiles:
-      - test
+      - stage
     env_file:
-      - .env
+      - .env.test
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - ./.env.test:/app/.env.test
     deploy:
       resources:
         limits:
@@ -252,6 +255,3 @@ volumes:
 networks:
   app-network:
     driver: bridge
-# <name> = dev, stage or test
-#docker-compose --profile <name> up --build -d
-

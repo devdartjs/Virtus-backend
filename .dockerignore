@@ -21,4 +21,12 @@ README.md
 sonar-project.properties
 Nginx.conf
 
+.env
+.env.development
+.env.production
+.env.test
+.env.development.local
+.env.production.local
+.env.test.local
+
 

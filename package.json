@@ -21,7 +21,7 @@
     "reset:development:local": "curl -i -X POST http://localhost:3000/api/v1/reset/ -H 'Content-type: application/json'",
     "reset:test": "curl -i -X POST http://localhost:3001/api/v1/reset/ -H 'Content-type: application/json'",
     "reset:test:local": "curl -i -X POST http://localhost:3000/api/v1/reset/ -H 'Content-type: application/json'",
-    "build": "bun build --target=bun --outdir=dist src/server.ts --env disable --minify --sourcemap=linked",
+    "build": "bun build --target=bun --outdir=build src/server.ts --env disable --minify --sourcemap=linked",
     "build:bi": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile server src/server.ts",
     "build:bundle": "bun build src/server.ts --minify-whitespace --minify-syntax --sourcemap=inline --target bun --outdir dist/server",
     "build:development": "bun run build:bundle && bun run build:copy:development",
@@ -64,6 +64,7 @@
   },
   "devDependencies": {
     "@opentelemetry/instrumentation-pg": "^0.55.0",
+    "@rollup/rollup-win32-x64-msvc": "^4.52.2",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "@vitest/coverage-istanbul": "^3.2.4",
