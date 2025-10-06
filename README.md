@@ -1,10 +1,10 @@
-# ⚪ Virtus Backend
+# 🔹 Virtus Backend
 
-A modular and type-safe RESTful backend for the **Virtus eCommerce Platform**, built with **Bun**, **Elysia.js**, and **TypeScript**, using **Docker** and **PostgreSQL** as relational database with **Prisma** as ORM.
+A modular and type-safe RESTful backend for the **Virtus eCommerce Platform**, built with **Bun**, **Elysia.js**, and **TypeScript**, using **Docker** and **PostgreSQL** as database.
 
 ---
 
-## ⚪ Table of Contents
+## Table of Contents
 
 - [📄 Features](#-features)
 - [📄 Technologies Used](#-technologies-used)
@@ -18,7 +18,7 @@ A modular and type-safe RESTful backend for the **Virtus eCommerce Platform**, b
 
 ---
 
-## ⚪ Some Features
+## Some Features
 
 - CRUD Support: Manage eCommerce resources like products and orders consistently.
 
@@ -36,14 +36,14 @@ A modular and type-safe RESTful backend for the **Virtus eCommerce Platform**, b
 
 ---
 
-## ⚪ Technologies Used
+## Technologies Used
 
 - **Bun** as JavaScript/TypeScript runtime
 - **Elysia.js** as Web framework
-- **TypeScript** for type safety
+- **TypeScript**
 - **PostgreSQL** as database layer with **Prisma ORM**
 - **Docker** and **Docker-Hub**
-- **Elysia t** for runtime schema validation
+- **Elysia type box** for runtime schema validation
 - **Swagger** / **OpenAPI 3.0** for API documentation
 - **OpenTelemetry** for simple observability
 - **Vitest** for testing
@@ -51,37 +51,26 @@ A modular and type-safe RESTful backend for the **Virtus eCommerce Platform**, b
 
 ---
 
-## ⚪ Getting Started
+## Getting Started
 
-### ⚪ Prerequisites
+### Prerequisites
 
 - **Bun** (>= 1.1.x)
 
-### ⚪ Clone the repository and run with containers
+### - Clone the repository and run with containers in dev/stage mode
 
 ```bash
 git clone https://github.com/devdartjs/Virtus-backend.git
-cd virtus-backend/app/
-docker-compose --profile <"env" > up --build
+cd virtus-backend/app/ && bun install
+docker-compose --profile <dev || stage> up --build
 ```
 
-Replace **<"env">** with:
-
-- dev → Development with Adminer (Database UI)
-- stage → Staging
-- test → Testing
-
-### ⚪ Testing inside containers
+### - Testing with containers
 
 ```bash
-docker-compose --profile test up --build -d
+bun run build
+docker-compose --profile stage up --build -d
 docker exec <app_container > bun run test:coverage
 ```
 
-### ⚪ Sonar-scanner report (with coverage)
-
-```bash
-docker-compose --profile test up --build -d
-docker exec <app_container > bun run test:coverage
-sonar-scanner
-```
+---

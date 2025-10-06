@@ -1,0 +1,41 @@
+app = "app-wild-dust-1031"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile.stage"
+
+[env]
+  BUN_ENV = "stage"
+  PORT = "3000"
+  BASE_URL = "https://app-wild-dust-1031.fly.dev"
+  DATABASE_URL = "placeholder"
+  REDIS_URL = "placeholder"
+  REDIS_HOST = "placeholder"
+  REDIS_PORT = "placeholder"
+  REDIS_PASSWORD = "placeholder"
+  CACHE_TTL = "placeholder"
+  RATE_LIMIT_MAX = "placeholder"
+  RATE_LIMIT_WINDOW = "placeholder"
+  SONAR_TOKEN = "placeholder"
+
+[experimental]
+  allowed_public_ports = []
+  auto_rollback = true
+
+[[services]]
+  internal_port = 3000
+  protocol = "tcp"
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    interval = 10000
+    timeout = 2000
+    grace_period = "10s"
+    restart_limit = 0

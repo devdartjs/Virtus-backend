@@ -46,3 +46,8 @@ yarn-error.log*
 **/*.log
 **/*.bun
 /src/generated/prisma
+
+|
+sonar-project
+sonar-project.properties
+.properties
