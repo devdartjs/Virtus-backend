@@ -166,6 +166,7 @@ services:
     ports:
       - "3004:3000"
     environment:
+      BUN_ENV: development
       DATABASE_URL: ${DATABASE_URL}
       PORT: ${PORT}
       REDIS_HOST: redis
@@ -181,12 +182,9 @@ services:
     volumes:
       - ./src:/app/src
       - ./prisma:/app/prisma
-      - ./.env.development:/app/.env.development
     profiles:
       - dev
       - snyk
-    env_file:
-      - .env.development
     deploy:
       resources:
         limits:
@@ -222,7 +220,7 @@ services:
     ports:
       - "3001:3000"
     environment:
-      BUN_ENV: test
+      BUN_ENV: stage
       DATABASE_URL: ${DATABASE_URL}
       PORT: ${PORT}
       REDIS_HOST: redis
@@ -237,12 +235,9 @@ services:
       - app-network
     profiles:
       - stage
-    env_file:
-      - .env.test
     volumes:
       - ./src:/app/src
       - ./prisma:/app/prisma
-      - ./.env.test:/app/.env.test
     deploy:
       resources:
         limits:

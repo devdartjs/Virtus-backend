@@ -40,7 +40,7 @@ jobs:
 
       # 5️⃣ Build the app
       - name: Build app
-        run: bun run build:stage
+        run: bun run build
 
       # 6️⃣ Check code format
       - name: Check code format
