@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeAll, afterAll } from "vitest";
 import { Elysia } from "elysia";
 import { productsRoute } from "../../modules/products/controller-products";
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 import redis from "../../lib/redis/redis";
 
 const TEST_HOST = "http://localhost";

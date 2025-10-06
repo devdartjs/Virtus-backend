@@ -1,5 +1,5 @@
 /* eslint no-console: ["error", { "allow": ["log", "error"] }] */
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 import productsSeed from "../utils/productsSeed";
 
 async function seedProducts() {

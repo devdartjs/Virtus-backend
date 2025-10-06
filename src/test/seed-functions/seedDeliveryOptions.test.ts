@@ -1,6 +1,6 @@
 /* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 import seedDeliveryOptions from "../../lib/seed-functions/seedDeliveryOptions";
 
 vi.spyOn(console, "log").mockImplementation(() => {});

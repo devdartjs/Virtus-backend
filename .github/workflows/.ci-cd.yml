@@ -1,9 +1,10 @@
-name: CI
+name: CI-CD pipeline
 
 on:
   push:
     branches:
       - main
+      - stage
   pull_request:
     branches:
       - main
@@ -72,14 +73,14 @@ jobs:
         run: printf "%s\n" "${{ secrets.ENV }}" > .env
 
       # 3️⃣ Start containers, wait for DB, apply migrations & seed and prepare node enviroment for Vitest
-      - name: Set up Docker Compose
+      - name: Set up Stage Docker Compose
         env:
           DATABASE_URL: postgresql://dart:${{ secrets.POSTGRES_PASSWORD }}@db:5432/postgresdb
           POSTGRES_USER: dart
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: postgresdb
           PORT: 3000
-        run: docker compose --profile test up --build -d
+        run: docker compose --profile stage up --build -d
 
       - name: Wait for PostgreSQL
         run: |
@@ -102,13 +103,29 @@ jobs:
           docker compose exec -T app4 bunx prisma db seed
 
       # 4️⃣ Run tests (coverage)
-      - name: Run tests (to generate coverage/lcov.info file for sonar)
+      - name: Run tests (unit & integration)
         run: docker compose exec -T app4 bun run test:coverage
-      # 5️⃣ Tear down Docker containers
+      # # 5️⃣ Copiar pasta de coverage do container para o host
+      # - name: Copy coverage folder
+      #   run: docker cp $(docker compose ps -q app4):/usr/src/app/coverage ./coverage
+
+      # # 6️⃣ Instalar sonar-scanner e dependências
+      # - name: Set up SonarQube scanner
+      #   uses: sonarsource/sonarcloud-github-action@v2
+      #   with:
+      #     args: >
+      #       -Dsonar.organization=devdartjs
+      #       -Dsonar.projectKey=Virtus-backend
+      #       -Dsonar.host.url=https://sonarcloud.io
+      #       -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      #       -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+
+      # 7️⃣ Tear down Docker containers
       - name: Tear down containers
+        if: always()
         run: docker compose down --volumes --remove-orphans
 
-      # 6️⃣ Clean up the .env file
+      # 8️⃣ Clean up the .env file
       - name: Cleanup .env
         run: rm -f .env
 
@@ -156,49 +173,33 @@ jobs:
 
       # 7️⃣ Push Docker images
       - name: Push Docker images
-        run: docker push dartw/virtus-backend:${{ github.sha }} && docker push dartw/virtus-backend:dev
+        run: docker push dartw/virtus-backend:${{ github.sha }} && docker push dartw/virtus-backend:stage
 
       - name: Cleanup .env
         run: rm -f .env
 
-  deploy-stage:
-    name: Deploy to Stage
+  deploy:
+    name: Deploy to Fly.io (Stage)
     runs-on: ubuntu-latest
+    environment: stage
     needs: build-and-push-image
 
     steps:
-      # 1️⃣ Checkout repository
+      # 1️⃣ Checkout
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2️⃣ Install Fly CLI
-      - name: Install Flyctl
-        run: |
-          curl -L https://fly.io/install.sh | sh
-          echo "$HOME/.fly/bin" >> $GITHUB_PATH
+      # 2️⃣ Install Flyctl
+      - name: Setup Flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
 
-      # 3️⃣ Login to Fly.io
-      - name: Fly login using token
+      # 3️⃣ deploy
+      - name: Set Fly secret
+        run: flyctl secrets set DATABASE_URL=${{ secrets.DATABASE_URL_STAGE }} -a app-wild-dust-1031
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_VIRTUS_BACKEND }}
-        run: flyctl auth token
 
-      # 4️⃣ Deploy Docker image to Fly.io stage
-      - name: Deploy to stage
+      - name: Deploy app to Fly.io (Stage)
+        run: flyctl deploy --app app-wild-dust-1031 --image dartw/virtus-backend:stage
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_VIRTUS_BACKEND }}
-        run: |
-          flyctl deploy \
-            --app my-app-stage \
-            --image dartw/virtus-backend:dev \
-            --region gru \
-            --strategy immediate
-
-      # 5️⃣ Optional: wait a few seconds for the app to become healthy
-      - name: Wait for app
-        run: sleep 10
-
-      # 6️⃣ Run stage smoke tests (optional)
-      - name: Run stage smoke tests
-        run: |
-          curl -f https://api.my-app.fly/health || exit 1

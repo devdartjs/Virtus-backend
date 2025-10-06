@@ -1,5 +1,5 @@
 import { CartItem } from "@prisma/client";
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 
 export class CartItemsService {
   static async getCartItems(): Promise<CartItem[]> {
@@ -40,10 +40,10 @@ export class CartItemsService {
     return await prisma.cartItem.update({
       where: { id },
       data: {
-        ...(data.quantity !== undefined ? { quantity: data.quantity } : {}),
-        ...(data.deliveryOptionId !== undefined
-          ? { deliveryOption: { connect: { id: data.deliveryOptionId } } }
-          : {})
+        ...(data.quantity === undefined ? {} : { quantity: data.quantity }),
+        ...(data.deliveryOptionId === undefined
+          ? {}
+          : { deliveryOption: { connect: { id: data.deliveryOptionId } } })
       },
       select: {
         id: true,

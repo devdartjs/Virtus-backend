@@ -1,7 +1,0 @@
-organization=devdartjs
-projectKey=Virtus-backend
-serverUrl=https://sonarcloud.io
-serverVersion=8.0.0.67240
-dashboardUrl=https://sonarcloud.io/dashboard?id=Virtus-backend
-ceTaskId=AZlSSpPZ3YH_RtH7OuGI
-ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZlSSpPZ3YH_RtH7OuGI

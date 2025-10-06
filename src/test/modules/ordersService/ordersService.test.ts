@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { listOrders, createOrder, getOrderById } from "../../../modules/orders/service-orders";
 
-vi.mock("../../../../prisma/database-prisma", () => ({
+vi.mock("../../../database/database-prisma.ts", () => ({
   prisma: {
     order: {
       findMany: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock("../../../../prisma/database-prisma", () => ({
   }
 }));
 
-import { prisma } from "../../../../prisma/database-prisma";
+import { prisma } from "../../../database/database-prisma";
 
 describe("service-orders", () => {
   beforeEach(() => {

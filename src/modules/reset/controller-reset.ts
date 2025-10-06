@@ -1,8 +1,8 @@
 /* eslint no-console: ["error", { "allow": ["log", "error"] }] */
 import { Elysia } from "elysia";
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 import { record } from "@elysiajs/opentelemetry";
-import { seed } from "../../../prisma/database-seed";
+import { seed } from "../../database/database-seed";
 
 export const resetRoute = new Elysia({ prefix: "/api/v1/reset" }).post("/", async ({ set }) =>
   record("db.resetDatabase", async () => {

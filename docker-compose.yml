@@ -4,148 +4,145 @@ services:
     restart: always
     shm_size: 128mb
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: dart
+      POSTGRES_PASSWORD: nghk98734
+      POSTGRES_DB: postgresdb
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U dart -d postgresdb"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
       - app-network
-    deploy:
-      resources:
-        limits:
-          memory: 512m
-          cpus: "0.5"
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8080:8080"
-    depends_on:
+    profiles:
+      - dev
+      - stage
       - db
-    networks:
-      - app-network
-    profiles:
-      - dev
     deploy:
       resources:
         limits:
-          memory: 256m
-          cpus: "0.25"
-
-  app:
-    build: .
-    restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - app-network
-    profiles:
-      - dev
-    deploy:
-      resources:
-        limits:
-          memory: 512m
+          memory: 1g
           cpus: "0.5"
-
-  app1:
-    build: .
-    restart: always
-    ports:
-      - "3001:3000"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - app-network
-    profiles:
-      - stage
-    deploy:
-      resources:
-        limits:
-          memory: 512m
-          cpus: "0.5"
-
-  app2:
-    build: .
-    restart: always
-    ports:
-      - "3002:3000"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - app-network
-    profiles:
-      - stage
-    deploy:
-      resources:
-        limits:
-          memory: 512m
-          cpus: "0.5"
-
-  app3:
-    build: .
-    restart: always
-    ports:
-      - "3003:3000"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - app-network
-    profiles:
-      - stage
-    deploy:
-      resources:
-        limits:
-          memory: 512m
-          cpus: "0.5"
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - app1
-      - app2
-      - app3
-    networks:
-      - app-network
-    profiles:
-      - stage
-    deploy:
-      resources:
-        limits:
-          memory: 256m
-          cpus: "0.25"
-
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - dev
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 256m
+  #         cpus: "0.25"
+  # app:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL}
+  #     PORT: ${PORT}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - dev
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 512m
+  #         cpus: "0.5"
+  # app1:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - "3001:3000"
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL}
+  #     PORT: ${PORT}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - stage
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 512m
+  #         cpus: "0.5"
+  # app2:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - "3002:3000"
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL}
+  #     PORT: ${PORT}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - stage
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 512m
+  #         cpus: "0.5"
+  # app3:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - "3003:3000"
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL}
+  #     PORT: ${PORT}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - stage
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 512m
+  #         cpus: "0.5"
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: nginx
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #   depends_on:
+  #     - app1
+  #     - app2
+  #     - app3
+  #   networks:
+  #     - app-network
+  #   profiles:
+  #     - stage
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 256m
+  #         cpus: "0.25"
   redis:
     image: redis:7
     container_name: redis
@@ -155,6 +152,7 @@ services:
       - app-network
     profiles:
       - stage
+      - dev
       - test
       - snyk
     deploy:
@@ -180,17 +178,20 @@ services:
         condition: service_started
     networks:
       - app-network
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - ./.env.development:/app/.env.development
     profiles:
-      - test
+      - dev
       - snyk
     env_file:
-      - .env
+      - .env.development
     deploy:
       resources:
         limits:
           memory: 512m
           cpus: "0.5"
-
   snyk:
     image: snyk/snyk-cli:docker
     container_name: snyk
@@ -213,6 +214,40 @@ services:
         limits:
           memory: 256m
           cpus: "0.25"
+  app4-stage:
+    build:
+      context: .
+      dockerfile: Dockerfile.stage
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      BUN_ENV: test
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - app-network
+    profiles:
+      - stage
+    env_file:
+      - .env.test
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - ./.env.test:/app/.env.test
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: "0.5"
 
 volumes:
   db_data:
@@ -220,6 +255,3 @@ volumes:
 networks:
   app-network:
     driver: bridge
-# <name> = dev, stage or test
-#docker-compose --profile <name> up --build -d
-

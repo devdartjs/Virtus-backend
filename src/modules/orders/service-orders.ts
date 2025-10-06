@@ -1,4 +1,4 @@
-import { prisma } from "../../../prisma/database-prisma";
+import { prisma } from "../../database/database-prisma";
 
 type CartItem = {
   productId: string;

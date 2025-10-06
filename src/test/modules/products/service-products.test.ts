@@ -2,7 +2,7 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { ProductService } from "../../../modules/products/service-products";
 import * as cacheModule from "../../../lib/redis/cache";
-import { prisma } from "../../../../prisma/database-prisma";
+import { prisma } from "../../../database/database-prisma";
 
 vi.mock("../../../lib/redis/cache");
 

@@ -1,9 +1,0 @@
-name = "elysia-app"
-main = "src/server.ts"
-
-preload = ["./src/instrumentation.ts"]
-
-compiler-options.target = "bun"
-
-[define]
-NODE_ENV = "development"

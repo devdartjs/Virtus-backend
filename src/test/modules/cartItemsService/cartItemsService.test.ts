@@ -1,8 +1,8 @@
 import { describe, test, expect, afterEach, vi } from "vitest";
 import { CartItemsService } from "../../../modules/cart-items/service-cart-item";
-import { prisma } from "../../../../prisma/database-prisma";
+import { prisma } from "../../../database/database-prisma";
 
-vi.mock("../../../../prisma/database-prisma", () => {
+vi.mock("../../../database/database-prisma.ts", () => {
   return {
     prisma: {
       cartItem: {

@@ -1,1 +1,0 @@
- 2tsX hr%src/modules/reset/controller-reset.ts
