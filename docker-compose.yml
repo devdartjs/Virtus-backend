@@ -168,7 +168,7 @@ services:
     environment:
       BUN_ENV: development
       DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
+      PORT: 3000
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ""
@@ -179,9 +179,6 @@ services:
         condition: service_started
     networks:
       - app-network
-    volumes:
-      - ./src:/app/src
-      - ./prisma:/app/prisma
     profiles:
       - dev
       - snyk
@@ -222,7 +219,7 @@ services:
     environment:
       BUN_ENV: stage
       DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
+      PORT: 3000
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ""
@@ -235,9 +232,6 @@ services:
       - app-network
     profiles:
       - stage
-    volumes:
-      - ./src:/app/src
-      - ./prisma:/app/prisma
     deploy:
       resources:
         limits:

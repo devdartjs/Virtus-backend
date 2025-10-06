@@ -8,15 +8,10 @@ primary_region = "iad"
   BUN_ENV = "stage"
   PORT = "3000"
   BASE_URL = "https://app-wild-dust-1031.fly.dev"
-  DATABASE_URL = "placeholder"
-  REDIS_URL = "placeholder"
-  REDIS_HOST = "placeholder"
-  REDIS_PORT = "placeholder"
-  REDIS_PASSWORD = "placeholder"
-  CACHE_TTL = "placeholder"
-  RATE_LIMIT_MAX = "placeholder"
-  RATE_LIMIT_WINDOW = "placeholder"
-  SONAR_TOKEN = "placeholder"
+  DATABASE_URL = "placeholder"  
+  RATE_LIMIT_MAX = "placeholder"  
+  RATE_LIMIT_WINDOW = "placeholder" 
+  SONAR_TOKEN = "placeholder"   
 
 [experimental]
   allowed_public_ports = []
@@ -25,6 +20,9 @@ primary_region = "iad"
 [[services]]
   internal_port = 3000
   protocol = "tcp"
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
 
   [[services.ports]]
     handlers = ["http"]
@@ -34,8 +32,9 @@ primary_region = "iad"
     handlers = ["tls", "http"]
     port = 443
 
-  [[services.tcp_checks]]
-    interval = 10000
-    timeout = 2000
-    grace_period = "10s"
-    restart_limit = 0
+  [[services.http_checks]]
+    interval = "15s"
+    timeout = "15s" 
+    grace_period = "45s" 
+    method= "GET"       
+    path = "/"  

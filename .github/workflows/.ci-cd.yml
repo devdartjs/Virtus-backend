@@ -75,9 +75,9 @@ jobs:
       # 3️⃣ Start containers, wait for DB, apply migrations & seed and prepare node enviroment for Vitest
       - name: Set up Stage Docker Compose
         env:
-          DATABASE_URL: postgresql://dart:${{ secrets.POSTGRES_PASSWORD }}@db:5432/postgresdb
+          DATABASE_URL: postgresql://dart:nghk98734@db:5432/postgresdb
           POSTGRES_USER: dart
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_PASSWORD: nghk98734
           POSTGRES_DB: postgresdb
           PORT: 3000
         run: docker compose --profile stage up --build -d
@@ -96,15 +96,10 @@ jobs:
             fi
           done
 
-      - name: Apply migrations, generate Prisma client & seed
-        run: |
-          docker compose exec -T app4 bunx prisma migrate deploy
-          docker compose exec -T app4 bunx prisma generate
-          docker compose exec -T app4 bunx prisma db seed
-
       # 4️⃣ Run tests (coverage)
       - name: Run tests (unit & integration)
-        run: docker compose exec -T app4 bun run test:coverage
+        run: docker compose run --rm app4-stage bun run test:coverage
+
       # # 5️⃣ Copiar pasta de coverage do container para o host
       # - name: Copy coverage folder
       #   run: docker cp $(docker compose ps -q app4):/usr/src/app/coverage ./coverage
@@ -169,7 +164,7 @@ jobs:
 
       # 6️⃣ Tag image as dev
       - name: Tag image
-        run: docker tag dartw/virtus-backend:${{ github.sha }} dartw/virtus-backend:dev
+        run: docker tag dartw/virtus-backend:${{ github.sha }} dartw/virtus-backend:stage
 
       # 7️⃣ Push Docker images
       - name: Push Docker images
@@ -185,21 +180,32 @@ jobs:
     needs: build-and-push-image
 
     steps:
-      # 1️⃣ Checkout
+      # 1️⃣ Checkout and set up
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Install Flyctl
+      # 2️⃣ Install Flyctl and auth
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
+        with:
+          version: latest
 
-      # 3️⃣ deploy
-      - name: Set Fly secret
-        run: flyctl secrets set DATABASE_URL=${{ secrets.DATABASE_URL_STAGE }} -a app-wild-dust-1031
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_VIRTUS_BACKEND }}
+      # 3️⃣ set secrets and deploy
+      - name: Set Fly secrets and Deploy to Stage
+        run: |
+          flyctl secrets set \
+            DATABASE_URL="${{ secrets.DATABASE_URL_STAGE_PG_FLY_SSLDISABLE }}" \
+            REDIS_URL="${{ secrets.REDIS_URL }}" \
+            REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}" \
+            BUN_ENV=stage \
+            BASE_URL=https://app-wild-dust-1031.fly.dev \
+            CACHE_TTL=3600 \
+            RATE_LIMIT_MAX=100 \
+            RATE_LIMIT_WINDOW=60 \
+            --app app-wild-dust-1031
 
-      - name: Deploy app to Fly.io (Stage)
-        run: flyctl deploy --app app-wild-dust-1031 --image dartw/virtus-backend:stage
+            flyctl deploy --app app-wild-dust-1031 --image dartw/virtus-backend:stage --remote-only --wait-timeout=180s
+
+            curl -v https://app-wild-dust-1031.fly.dev/
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_VIRTUS_BACKEND }}

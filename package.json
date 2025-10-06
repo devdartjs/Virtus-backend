@@ -13,7 +13,7 @@
     "test:integration": "bunx vitest run src/test/integration",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "bunx prisma migrate deploy",
-    "seed": "bun run src/database/database-seed.ts",
+    "prisma:seed": "bun run src/database/database-seed.ts",
     "build": "bun build --target=bun --outdir=build src/server.ts --env disable --minify --sourcemap=linked",
     "start": "bun --watch run build/server.js",
     "build:bi": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile server src/server.ts",
