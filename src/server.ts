@@ -16,15 +16,6 @@ import { resetRoute } from "./modules/reset/controller-reset";
 import { getPaymentSummaryRoute } from "./modules/payment-summary/controller-ps";
 import { ProductService } from "./modules/products/service-products";
 
-if (process.env.BUN_ENV === "stage") {
-  try {
-    await ProductService.preloadCache();
-    console.log("Product cache successfully preloaded");
-  } catch (err) {
-    console.error("Error preloading cache:", err);
-  }
-}
-
 export const isDevOrStage = ["development", "stage"].includes(process.env.BUN_ENV || "");
 
 export const app = new Elysia()
@@ -78,4 +69,24 @@ if (isDevOrStage) {
     ✅ Jaeger.UI is running at http://localhost:16686
     ✅ Jaeger.OTLP is running at http://localhost:4318/v1/trace
 `);
+}
+
+// if (process.env.BUN_ENV === "stage") {
+//   try {
+//     await ProductService.preloadCache();
+//     console.log("Product cache successfully preloaded");
+//   } catch (err) {
+//     console.error("Error preloading cache:", err);
+//   }
+// }
+
+if (process.env.BUN_ENV === "stage") {
+  (async () => {
+    try {
+      await ProductService.preloadCache();
+      console.log("Product cache successfully preloaded (background)");
+    } catch (err) {
+      console.error("Error preloading cache (background):", err);
+    }
+  })();
 }
