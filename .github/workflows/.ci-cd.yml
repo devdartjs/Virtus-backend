@@ -204,7 +204,7 @@ jobs:
             RATE_LIMIT_WINDOW=60 \
             --app app-wild-dust-1031
 
-            flyctl deploy --app app-wild-dust-1031 --image dartw/virtus-backend:stage --remote-only --wait-timeout=180s
+            flyctl deploy --app app-wild-dust-1031 --image dartw/virtus-backend:stage --remote-only --wait-timeout=300s
 
             curl -v https://app-wild-dust-1031.fly.dev/
         env:

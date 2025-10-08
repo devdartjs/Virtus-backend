@@ -68,7 +68,7 @@ export const app = new Elysia()
     return "Elysia server is up and running!";
   })
   .listen({
-    port: Number.parseInt(process.env.PORT || "5000"),
+    port: process.env.PORT ? Number.parseInt(process.env.PORT) : 5000,
     hostname: "0.0.0.0"
   });
 
