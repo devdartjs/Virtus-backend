@@ -16,7 +16,7 @@ import { resetRoute } from "./modules/reset/controller-reset";
 import { getPaymentSummaryRoute } from "./modules/payment-summary/controller-ps";
 import { ProductService } from "./modules/products/service-products";
 
-if (process.env.BUN_ENV === "test" || process.env.BUN_ENV === "test.local") {
+if (process.env.BUN_ENV === "stage") {
   try {
     await ProductService.preloadCache();
     console.log("Product cache successfully preloaded");
@@ -25,9 +25,7 @@ if (process.env.BUN_ENV === "test" || process.env.BUN_ENV === "test.local") {
   }
 }
 
-export const isDevOrTest = ["development", "development.local", "test", "test.local"].includes(
-  process.env.BUN_ENV || ""
-);
+export const isDevOrStage = ["development", "stage"].includes(process.env.BUN_ENV || "");
 
 export const app = new Elysia()
   .use(cors())
@@ -35,7 +33,7 @@ export const app = new Elysia()
   .use(
     opentelemetry({
       spanProcessors: [
-        ...(isDevOrTest
+        ...(isDevOrStage
           ? [
               new BatchSpanProcessor(new ConsoleSpanExporter()),
               new BatchSpanProcessor(
@@ -55,7 +53,7 @@ export const app = new Elysia()
   .use(resetRoute)
   .use(getPaymentSummaryRoute)
   .get("/", ({ headers }) => {
-    if (isDevOrTest) {
+    if (isDevOrStage) {
       return {
         message: "Hello Elysia",
         realIp: headers["x-real-ip"] ?? "not provided",
@@ -74,7 +72,7 @@ export const app = new Elysia()
     hostname: "0.0.0.0"
   });
 
-if (isDevOrTest) {
+if (isDevOrStage) {
   console.log(`
     ✅ Elysia Server is running at http://${app.server?.hostname}:${app.server?.port}
     ✅ Jaeger.UI is running at http://localhost:16686
