@@ -16,18 +16,7 @@ import { resetRoute } from "./modules/reset/controller-reset";
 import { getPaymentSummaryRoute } from "./modules/payment-summary/controller-ps";
 import { ProductService } from "./modules/products/service-products";
 
-if (process.env.BUN_ENV === "test" || process.env.BUN_ENV === "test.local") {
-  try {
-    await ProductService.preloadCache();
-    console.log("Product cache successfully preloaded");
-  } catch (err) {
-    console.error("Error preloading cache:", err);
-  }
-}
-
-export const isDevOrTest = ["development", "development.local", "test", "test.local"].includes(
-  process.env.BUN_ENV || ""
-);
+export const isDevOrStage = ["development", "stage"].includes(process.env.BUN_ENV || "");
 
 export const app = new Elysia()
   .use(cors())
@@ -35,7 +24,7 @@ export const app = new Elysia()
   .use(
     opentelemetry({
       spanProcessors: [
-        ...(isDevOrTest
+        ...(isDevOrStage
           ? [
               new BatchSpanProcessor(new ConsoleSpanExporter()),
               new BatchSpanProcessor(
@@ -55,7 +44,7 @@ export const app = new Elysia()
   .use(resetRoute)
   .use(getPaymentSummaryRoute)
   .get("/", ({ headers }) => {
-    if (isDevOrTest) {
+    if (isDevOrStage) {
       return {
         message: "Hello Elysia",
         realIp: headers["x-real-ip"] ?? "not provided",
@@ -70,14 +59,34 @@ export const app = new Elysia()
     return "Elysia server is up and running!";
   })
   .listen({
-    port: Number.parseInt(process.env.PORT || "5000"),
+    port: process.env.PORT ? Number.parseInt(process.env.PORT) : 5000,
     hostname: "0.0.0.0"
   });
 
-if (isDevOrTest) {
+if (isDevOrStage) {
   console.log(`
     ✅ Elysia Server is running at http://${app.server?.hostname}:${app.server?.port}
     ✅ Jaeger.UI is running at http://localhost:16686
     ✅ Jaeger.OTLP is running at http://localhost:4318/v1/trace
 `);
+}
+
+// if (process.env.BUN_ENV === "stage") {
+//   try {
+//     await ProductService.preloadCache();
+//     console.log("Product cache successfully preloaded");
+//   } catch (err) {
+//     console.error("Error preloading cache:", err);
+//   }
+// }
+
+if (process.env.BUN_ENV === "stage") {
+  (async () => {
+    try {
+      await ProductService.preloadCache();
+      console.log("Product cache successfully preloaded (background)");
+    } catch (err) {
+      console.error("Error preloading cache (background):", err);
+    }
+  })();
 }
