@@ -156,7 +156,7 @@ jobs:
 
       # 1️⃣ Create .env from the secret
       - name: Create .env
-        run: printf "%s\n" "${{ secrets.ENV }}" > .env
+        run: printf "%s\n" "${{ secrets.ENV_STAGE }}" > .env
 
       # 5️⃣ Build Docker image
       - name: Build Docker image

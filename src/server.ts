@@ -71,16 +71,7 @@ if (isDevOrStage) {
 `);
 }
 
-// if (process.env.BUN_ENV === "stage") {
-//   try {
-//     await ProductService.preloadCache();
-//     console.log("Product cache successfully preloaded");
-//   } catch (err) {
-//     console.error("Error preloading cache:", err);
-//   }
-// }
-
-if (process.env.BUN_ENV === "stage") {
+if (process.env.BUN_ENV === "stage" || process.env.BUN_ENV === "development") {
   (async () => {
     try {
       await ProductService.preloadCache();
