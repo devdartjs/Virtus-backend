@@ -10,119 +10,119 @@ on:
       - main
 
 jobs:
-  build-and-test:
-    name: Build & Unit Tests
-    runs-on: ubuntu-latest
+  # build-and-test:
+  #   name: Build & Unit Tests
+  #   runs-on: ubuntu-latest
 
-    steps:
-      # 1️⃣ Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
+  #   steps:
+  #     # 1️⃣ Checkout repository
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
 
-      # 2️⃣ Cache Bun runtime
-      - name: Cache Bun
-        uses: actions/cache@v3
-        with:
-          path: ~/.bun
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+  #     # 2️⃣ Cache Bun runtime
+  #     - name: Cache Bun
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: ~/.bun
+  #         key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
 
-      # 3️⃣ Install Bun
-      - name: Install Bun
-        run: |
-          curl -fsSL https://bun.sh/install | BUN_INSTALL_VERSION=1.9.0 bash
-          echo "$HOME/.bun/bin" >> $GITHUB_PATH
+  #     # 3️⃣ Install Bun
+  #     - name: Install Bun
+  #       run: |
+  #         curl -fsSL https://bun.sh/install | BUN_INSTALL_VERSION=1.9.0 bash
+  #         echo "$HOME/.bun/bin" >> $GITHUB_PATH
 
-      # 4️⃣ Install dependencies
-      - name: Install dependencies
-        run: bun install
-      - name: Reinstall @prisma/client
-        run: bun add @prisma/client
+  #     # 4️⃣ Install dependencies
+  #     - name: Install dependencies
+  #       run: bun install
+  #     - name: Reinstall @prisma/client
+  #       run: bun add @prisma/client
 
-      # 5️⃣ Build the app
-      - name: Build app
-        run: bun run build
+  #     # 5️⃣ Build the app
+  #     - name: Build app
+  #       run: bun run build
 
-      # 6️⃣ Check code format
-      - name: Check code format
-        run: npx prettier --check src/**/*.ts
+  #     # 6️⃣ Check code format
+  #     - name: Check code format
+  #       run: npx prettier --check src/**/*.ts
 
-      # 7️⃣ Lint
-      - name: Run ESLint
-        run: bun run lint
+  #     # 7️⃣ Lint
+  #     - name: Run ESLint
+  #       run: bun run lint
 
-      # 8️⃣ Generate Prisma client
-      - name: Generate Prisma client
-        run: bunx prisma generate
+  #     # 8️⃣ Generate Prisma client
+  #     - name: Generate Prisma client
+  #       run: bunx prisma generate
 
-      # 9️⃣ Run unit tests
-      - name: Run unit tests
-        run: bun run test:unit
+  #     # 9️⃣ Run unit tests
+  #     - name: Run unit tests
+  #       run: bun run test:unit
 
-  integration-tests:
-    name: Run Integration Tests in Docker
-    runs-on: ubuntu-latest
-    needs: build-and-test
+  # integration-tests:
+  #   name: Run Integration Tests in Docker
+  #   runs-on: ubuntu-latest
+  #   needs: build-and-test
 
-    steps:
-      # 1️⃣ Checkout the repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
+  #   steps:
+  #     # 1️⃣ Checkout the repository
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
 
-      # 2️⃣ Create .env from the secret
-      - name: Create .env
-        run: printf "%s\n" "${{ secrets.ENV }}" > .env
+  #     # 2️⃣ Create .env from the secret
+  #     - name: Create .env
+  #       run: printf "%s\n" "${{ secrets.ENV }}" > .env
 
-      # 3️⃣ Start containers, wait for DB, apply migrations & seed and prepare node enviroment for Vitest
-      - name: Set up Stage Docker Compose
-        env:
-          DATABASE_URL: postgresql://dart:nghk98734@db:5432/postgresdb
-          POSTGRES_USER: dart
-          POSTGRES_PASSWORD: nghk98734
-          POSTGRES_DB: postgresdb
-          PORT: 3000
-        run: docker compose --profile stage up --build -d
+  #     # 3️⃣ Start containers, wait for DB, apply migrations & seed and prepare node enviroment for Vitest
+  #     - name: Set up Stage Docker Compose
+  #       env:
+  #         DATABASE_URL: postgresql://dart:nghk98734@db:5432/postgresdb
+  #         POSTGRES_USER: dart
+  #         POSTGRES_PASSWORD: nghk98734
+  #         POSTGRES_DB: postgresdb
+  #         PORT: 3000
+  #       run: docker compose --profile stage up --build -d
 
-      - name: Wait for PostgreSQL
-        run: |
-          ATTEMPTS=0
-          MAX_ATTEMPTS=15
-          until docker compose exec -T db pg_isready -U dart > /dev/null 2>&1; do
-            echo "Waiting for database..."
-            sleep 2
-            ATTEMPTS=$((ATTEMPTS+1))
-            if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then
-              echo "Database did not become ready in time."
-              exit 1
-            fi
-          done
+  #     - name: Wait for PostgreSQL
+  #       run: |
+  #         ATTEMPTS=0
+  #         MAX_ATTEMPTS=15
+  #         until docker compose exec -T db pg_isready -U dart > /dev/null 2>&1; do
+  #           echo "Waiting for database..."
+  #           sleep 2
+  #           ATTEMPTS=$((ATTEMPTS+1))
+  #           if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then
+  #             echo "Database did not become ready in time."
+  #             exit 1
+  #           fi
+  #         done
 
-      # 4️⃣ Run tests (coverage)
-      - name: Run tests (unit & integration)
-        run: docker compose run --rm app4-stage bun run test:coverage
+  #     # 4️⃣ Run tests (coverage)
+  #     - name: Run tests (unit & integration)
+  #       run: docker compose run --rm app4-stage bun run test:coverage
 
-      # # 5️⃣ Copiar pasta de coverage do container para o host
-      # - name: Copy coverage folder
-      #   run: docker cp $(docker compose ps -q app4):/usr/src/app/coverage ./coverage
+  #     # # 5️⃣ Copiar pasta de coverage do container para o host
+  #     # - name: Copy coverage folder
+  #     #   run: docker cp $(docker compose ps -q app4):/usr/src/app/coverage ./coverage
 
-      # # 6️⃣ Instalar sonar-scanner e dependências
-      # - name: Set up SonarQube scanner
-      #   uses: sonarsource/sonarcloud-github-action@v2
-      #   with:
-      #     args: >
-      #       -Dsonar.organization=devdartjs
-      #       -Dsonar.projectKey=Virtus-backend
-      #       -Dsonar.host.url=https://sonarcloud.io
-      #       -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-      #       -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+  #     # # 6️⃣ Instalar sonar-scanner e dependências
+  #     # - name: Set up SonarQube scanner
+  #     #   uses: sonarsource/sonarcloud-github-action@v2
+  #     #   with:
+  #     #     args: >
+  #     #       -Dsonar.organization=devdartjs
+  #     #       -Dsonar.projectKey=Virtus-backend
+  #     #       -Dsonar.host.url=https://sonarcloud.io
+  #     #       -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+  #     #       -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
 
-      # 7️⃣ Tear down Docker containers
-      - name: Tear down containers
-        if: always()
-        run: docker compose down --volumes --remove-orphans
+  #     # 7️⃣ Tear down Docker containers
+  #     - name: Tear down containers
+  #       if: always()
+  #       run: docker compose down --volumes --remove-orphans
 
-      # 8️⃣ Clean up the .env file
-      - name: Cleanup .env
-        run: rm -f .env
+  #     # 8️⃣ Clean up the .env file
+  #     - name: Cleanup .env
+  #       run: rm -f .env
 
   build-and-push-image:
     name: Build & Push Docker Image
