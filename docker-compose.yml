@@ -213,18 +213,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.stage
+      args:
+        BUN_ENV: stage
     restart: always
     ports:
       - "3001:3000"
     environment:
       BUN_ENV: stage
-      DATABASE_URL: ${DATABASE_URL}
-      # DATABASE_URL_STAGE_NEON: ${DATABASE_URL_STAGE_NEON}
+      DATABASE_URL: postgresql://dart:nghk98734@db:5432/postgresdb
       PORT: 3000
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      # REDIS_URL_CLOUD: ${REDIS_URL_CLOUD}
       REDIS_PASSWORD: ""
+      # if connecting to Neon DB, uncomment the following lines
+      # DATABASE_URL_STAGE_NEON: ${DATABASE_URL_STAGE_NEON}
+      # REDIS_URL_CLOUD: ${REDIS_URL_CLOUD}
     depends_on:
       db:
         condition: service_healthy
@@ -237,7 +240,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1g
+          memory: 512M
           cpus: "0.5"
 
 volumes:

@@ -16,7 +16,8 @@ import { resetRoute } from "./modules/reset/controller-reset";
 import { getPaymentSummaryRoute } from "./modules/payment-summary/controller-ps";
 import { ProductService } from "./modules/products/service-products";
 
-export const isDevOrStage = ["development", "stage"].includes(process.env.BUN_ENV || "");
+// export const isDevOrStage = ["development", "stage"].includes(process.env.BUN_ENV || "");
+export const isDevOrStage = process.env.BUN_ENV === "development";
 
 export const app = new Elysia()
   .use(cors())

@@ -37,13 +37,10 @@ jobs:
         run: bun install
 
       - name: Install Install Prisma CLI + Client
-        run: bun add prisma@6.12.0 @prisma/client@6.16.2
+        run: bun add prisma@6.12.0 && bun add @prisma/client@6.16.2
 
       - name: Generate Prisma client
         run: bunx prisma generate
-
-      - name: Show Bun version
-        run: bun --version
 
       # 5️⃣ Build the app
       - name: Build app
@@ -57,11 +54,7 @@ jobs:
       - name: Run ESLint
         run: bun run lint
 
-      # # 8️⃣ Generate Prisma client
-      # - name: Generate Prisma client
-      #   run: bunx prisma generate
-
-      # 9️⃣ Run unit tests
+      # 8️⃣ Run unit tests
       - name: Run unit tests
         run: bun run test:unit
 
@@ -71,23 +64,33 @@ jobs:
     needs: build-and-test
 
     steps:
-      # 1️⃣ Checkout the repository
+      # 1️⃣ Checkout the repository and install bun
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Install Bun
+        run: |
+          curl -fsSL https://bun.sh/install | BUN_INSTALL_VERSION=1.9.0 bash
+          echo "$HOME/.bun/bin" >> $GITHUB_PATH
+
       # 2️⃣ Create .env from the secret
       - name: Create .env
-        run: printf "%s\n" "${{ secrets.ENV }}" > .env
+        run: printf "%s\n" "${{ secrets.ENV_STAGE }}" > .env
+
+      - name: Set envs
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL_STAGE_NEON }}" >> .env
+          echo "BUN_ENV=stage" >> .env
 
       # 3️⃣ Start containers, wait for DB, apply migrations & seed and prepare node enviroment for Vitest
       - name: Set up Stage Docker Compose
-        env:
-          DATABASE_URL: postgresql://dart:nghk98734@db:5432/postgresdb
-          POSTGRES_USER: dart
-          POSTGRES_PASSWORD: nghk98734
-          POSTGRES_DB: postgresdb
-          PORT: 3000
         run: docker compose --profile stage up --build -d
+
+      - name: show containers status
+        run: docker compose ps
+
+      - name: docker compose logs app4-stage
+        run: docker compose logs app4-stage --tail=200
 
       - name: Wait for PostgreSQL
         run: |
@@ -102,11 +105,27 @@ jobs:
               exit 1
             fi
           done
+          echo "Database is ready."
 
-      # 4️⃣ Run tests (coverage)
-      - name: Run Prisma Migrations (before tests)
-        run: docker compose exec -T app4-stage bunx prisma migrate deploy
+      - name: Check containers status
+        run: docker compose ps
 
+      - name: Debug env inside container
+        run: docker compose exec -T app4-stage printenv | grep DATABASE_URL
+
+      - name: Check container status
+        run: docker compose ps
+
+      - name: Logs do app stage
+        run: docker compose logs app4-stage --tail=200
+
+      # - name: Run migrations
+      #   run: docker compose exec -T app4-stage bunx prisma migrate deploy
+
+      # - name: logs after connecting database
+      #   run: docker compose logs app4-stage -f
+
+      # 4️⃣ Run tests (coverage) after migrations
       - name: Run tests (unit & integration)
         run: docker compose run --rm app4-stage bun run test:coverage
 
@@ -122,7 +141,7 @@ jobs:
   build-and-push-image:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
-    needs: integration-tests
+    needs: build-and-test
 
     steps:
       # 1️⃣ Checkout repository
@@ -190,7 +209,7 @@ jobs:
         run: |
           flyctl secrets set \
             REDIS_URL_CLOUD="${{ secrets.REDIS_URL_CLOUD }}" \
-            DATABASE_URL_STAGE_NEON="${{ secrets.DATABASE_URL_STAGE_NEON }}" \
+            DATABASE_URL="${{ secrets.DATABASE_URL_STAGE_NEON }}" \
             BUN_ENV=stage \
             BASE_URL=https://app-wild-dust-1031.fly.dev \
             CACHE_TTL=3600 \
