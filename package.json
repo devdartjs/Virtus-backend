@@ -14,7 +14,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "bunx prisma migrate deploy",
     "prisma:seed": "bun run src/database/database-seed.ts",
-    "build": "bun build --target=bun --outdir=build src/server.ts --env disable --minify --sourcemap=linked",
+    "build": "bun build src/server.ts --target=bun --outdir=build --external @prisma/client --external .prisma --minify --sourcemap=linked",
     "start": "bun --watch run build/server.js",
     "build:bi": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile server src/server.ts",
     "dhub:build": "docker build -f Dockerfile.stage --build-arg ENV_FILE=.env.test -t dartw/virtus-backend:stage-manual .",

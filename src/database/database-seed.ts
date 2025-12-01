@@ -5,7 +5,11 @@ import seedDeliveryOptions from "../lib/seed-functions/seedDeliveryOptions";
 
 export async function seed() {
   try {
-    console.log("Seeding database:", process.env.DATABASE_URL);
+    if (!process.env.DATABASE_URL_STAGE_NEON) {
+      console.log("Seeding database with db-container:");
+    } else {
+      console.log("Seeding database with db-cloud:");
+    }
 
     await seedProducts();
     await seedDeliveryOptions();

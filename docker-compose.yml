@@ -22,6 +22,7 @@ services:
       - dev
       - stage
       - db
+      - redispg
     deploy:
       resources:
         limits:
@@ -155,6 +156,7 @@ services:
       - dev
       - test
       - snyk
+      - redispg
     deploy:
       resources:
         limits:
@@ -219,9 +221,11 @@ services:
     environment:
       BUN_ENV: stage
       DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL_STAGE_NEON: ${DATABASE_URL_STAGE_NEON}
       PORT: 3000
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      REDIS_URL_CLOUD: ${REDIS_URL_CLOUD}
       REDIS_PASSWORD: ""
     depends_on:
       db:

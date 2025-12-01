@@ -30,7 +30,7 @@ export class ProductService {
     if (products.length === 0 || !products || !ttl) {
       return console.log("Error while loading products-preloadCache or ttl");
     } else {
-      console.log("products-preloadCache:", products, "ttl-preloadCache:", ttl);
+      console.log("products-preloadCache:", products.length, "ttl-preloadCache:", ttl);
     }
 
     for (const product of products) {

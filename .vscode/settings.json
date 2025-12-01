@@ -2,5 +2,6 @@
   "sonarlint.connectedMode.project": {
     "connectionId": "devdartjs",
     "projectKey": "devdartjs_Virtus-backend"
-  }
+  },
+  "prisma.pinToPrisma6": true
 }

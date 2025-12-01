@@ -23,7 +23,6 @@ console.log(`🔍 Resolved BUN_ENV: ${envName}`);
 console.log(`📄 Loading env file: ${pathToLoad}`);
 console.log("--------------------------------------------------");
 console.log(`✅ PORT = ${process.env.PORT}`);
-console.log(`✅ DATABASE_URL = ${process.env.DATABASE_URL}`);
 console.log(`✅ REDIS_HOST = ${process.env.REDIS_HOST}`);
 console.log(`✅ REDIS_PORT = ${process.env.REDIS_PORT}`);
 console.log(`✅ REDIS_PASSWORD = ${process.env.REDIS_PASSWORD ? "****" : "(not set)"}`);
