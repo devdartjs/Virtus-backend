@@ -104,6 +104,9 @@ jobs:
           done
 
       # 4️⃣ Run tests (coverage)
+      - name: Run Prisma Migrations (before tests)
+        run: docker compose exec -T app4-stage bunx prisma migrate deploy
+
       - name: Run tests (unit & integration)
         run: docker compose run --rm app4-stage bun run test:coverage
 
