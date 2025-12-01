@@ -193,8 +193,6 @@ services:
     image: snyk/snyk-cli:docker
     container_name: snyk
     command: sh
-    environment:
-      SNYK_TOKEN: ${SNYK_TOKEN}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/app
@@ -221,11 +219,11 @@ services:
     environment:
       BUN_ENV: stage
       DATABASE_URL: ${DATABASE_URL}
-      DATABASE_URL_STAGE_NEON: ${DATABASE_URL_STAGE_NEON}
+      # DATABASE_URL_STAGE_NEON: ${DATABASE_URL_STAGE_NEON}
       PORT: 3000
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_URL_CLOUD: ${REDIS_URL_CLOUD}
+      # REDIS_URL_CLOUD: ${REDIS_URL_CLOUD}
       REDIS_PASSWORD: ""
     depends_on:
       db:
